@@ -6,6 +6,22 @@ FAT with 32-bit allocation.
 
 Implements [`filesystem.Filesystem`](../interface.md). No cgo, no root.
 
+## Status
+
+| Read | Write | Format | Symlinks | On-disk format |
+|:--:|:--:|:--:|:--:|---|
+| ✅ | ✅ | ✅ | ✕ | FAT32 |
+
+## Supported
+
+- Read/write files
+- Directories, recursive delete, rename
+- Bare images + MBR/GPT
+
+## Not implemented
+
+- No POSIX symlinks (not in FAT32)
+
 ## Install
 
 ```bash
@@ -16,4 +32,4 @@ go get github.com/go-filesystems/fat32
 - API reference: <https://pkg.go.dev/github.com/go-filesystems/fat32>
 
 !!! note
-    See the module's `README.md` for supported features and current status.
+    See the module's README for full, up-to-date details.

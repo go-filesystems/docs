@@ -1,16 +1,16 @@
 # Drivers
 
-The 10 filesystem drivers available today.
+The 10 filesystem drivers available today. **Read** = open & inspect · **Write** = mutate in place · **Format** = create a fresh image.
 
-| | Module | Filesystem |
-|---|---|---|
-| <img src="../assets/fs/go-filesystems-apfs.png" width="30"> | [`apfs`](apfs.md) | Apple File System. |
-| <img src="../assets/fs/go-filesystems-btrfs.png" width="30"> | [`btrfs`](btrfs.md) | Copy-on-write Linux fs with snapshots and subvolumes. |
-| <img src="../assets/fs/go-filesystems-exfat.png" width="30"> | [`exfat`](exfat.md) | Extended FAT for large media. |
-| <img src="../assets/fs/go-filesystems-ext4.png" width="30"> | [`ext4`](ext4.md) | Linux ext4 — extents, 64-bit, journaling, metadata_csum. |
-| <img src="../assets/fs/go-filesystems-fat32.png" width="30"> | [`fat32`](fat32.md) | FAT with 32-bit allocation. |
-| <img src="../assets/fs/go-filesystems-ntfs.png" width="30"> | [`ntfs`](ntfs.md) | Windows NT filesystem. |
-| <img src="../assets/fs/go-filesystems-uefi.png" width="30"> | [`uefi`](uefi.md) | EFI System Partition (FAT-based). |
-| <img src="../assets/fs/go-filesystems-ufs.png" width="30"> | [`ufs`](ufs.md) | Unix File System (BSD). |
-| <img src="../assets/fs/go-filesystems-xfs.png" width="30"> | [`xfs`](xfs.md) | High-performance journaling filesystem. |
-| <img src="../assets/fs/go-filesystems-zfs.png" width="30"> | [`zfs`](zfs.md) | Copy-on-write pooled storage filesystem. |
+| | Module | Read | Write | Format | Symlinks | On-disk format |
+|---|---|:--:|:--:|:--:|:--:|---|
+| <img src="../assets/fs/go-filesystems-apfs.png" width="28"> | [`apfs`](apfs.md) | ✅ | ✅ | ✅ | ✅ | Real APFS on-disk (kext-mountable), GPT-aware |
+| <img src="../assets/fs/go-filesystems-btrfs.png" width="28"> | [`btrfs`](btrfs.md) | ✅ | ✅ | ✅ | ✅ | Single-device, CRC32c (btrfs-progs ≥ 5.x) |
+| <img src="../assets/fs/go-filesystems-exfat.png" width="28"> | [`exfat`](exfat.md) | ✅ | ✅ | ✅ | ✕ | exFAT |
+| <img src="../assets/fs/go-filesystems-ext4.png" width="28"> | [`ext4`](ext4.md) | ✅ | ✅ | ✅ | ✅ | ext4 — extents, 64-bit, flex_bg, dir htree, metadata_csum (CRC32c) |
+| <img src="../assets/fs/go-filesystems-fat32.png" width="28"> | [`fat32`](fat32.md) | ✅ | ✅ | ✅ | ✕ | FAT32 |
+| <img src="../assets/fs/go-filesystems-ntfs.png" width="28"> | [`ntfs`](ntfs.md) | ✅ | ✅ | ✅ | ✕ | Minimal in-image blob model — NOT the real NTFS on-disk format |
+| <img src="../assets/fs/go-filesystems-uefi.png" width="28"> | [`uefi`](uefi.md) | ✅ | ✅ | — | — | OVMF/EDK2 NvVar variable store (non-authenticated) |
+| <img src="../assets/fs/go-filesystems-ufs.png" width="28"> | [`ufs`](ufs.md) | ✅ | ✅ | ✅ | ✅ | UFS2 (FreeBSD 14.x); UFS1 not supported |
+| <img src="../assets/fs/go-filesystems-xfs.png" width="28"> | [`xfs`](xfs.md) | ✅ | ✅ | ✅ | ✅ | XFS v5 (CRC32c, ftype) |
+| <img src="../assets/fs/go-filesystems-zfs.png" width="28"> | [`zfs`](zfs.md) | ✅ | ✅ | ✅ | — | Single pool / single vdev (test-oriented subset) |
