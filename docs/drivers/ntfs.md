@@ -11,9 +11,9 @@ Implements [`filesystem.Filesystem`](../interface.md). No cgo, no root.
 
 ## Status
 
-| Read | Write | Format | Symlinks | On-disk format |
-|:--:|:--:|:--:|:--:|---|
-| ✅ | ✅ | ✅ | ✕ | Minimal in-image blob model — NOT the real NTFS on-disk format |
+| Read | Write | Format | Label | Symlinks | On-disk format |
+|:--:|:--:|:--:|:--:|:--:|---|
+| ✅ | ✅ | ✅ | ✅ | ✕ | Minimal in-image blob model — NOT the real NTFS on-disk format |
 
 ## Supported
 

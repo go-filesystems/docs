@@ -8,9 +8,9 @@ Implements [`filesystem.Filesystem`](../interface.md). No cgo, no root.
 
 ## Status
 
-| Read | Write | Format | Symlinks | On-disk format |
-|:--:|:--:|:--:|:--:|---|
-| ✅ | ✅ | ✅ | ✅ | Real APFS on-disk (kext-mountable), GPT-aware |
+| Read | Write | Format | Label | Symlinks | On-disk format |
+|:--:|:--:|:--:|:--:|:--:|---|
+| ✅ | ✅ | ✅ | — | ✅ | Real APFS on-disk (kext-mountable), GPT-aware |
 
 ## Supported
 
@@ -20,6 +20,7 @@ Implements [`filesystem.Filesystem`](../interface.md). No cgo, no root.
 - FileVault software encryption (`FormatContainerEncrypted`)
 - GPT + Apple DMG output
 - POSIX special files
+- Container resize (`Resize`)
 
 ## Not implemented
 

@@ -8,15 +8,17 @@ Implements [`filesystem.Filesystem`](../interface.md). No cgo, no root.
 
 ## Status
 
-| Read | Write | Format | Symlinks | On-disk format |
-|:--:|:--:|:--:|:--:|---|
-| ✅ | ✅ | ✅ | ✕ | FAT32 |
+| Read | Write | Format | Label | Symlinks | On-disk format |
+|:--:|:--:|:--:|:--:|:--:|---|
+| ✅ | ✅ | ✅ | ✅ | ✕ | FAT32 |
 
 ## Supported
 
 - Read/write files
 - Directories, recursive delete, rename
 - Bare images + MBR/GPT
+- Volume label (`Labeller`)
+- Resize (`filesystem.Resizer`)
 
 ## Not implemented
 

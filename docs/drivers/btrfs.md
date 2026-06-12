@@ -8,9 +8,9 @@ Implements [`filesystem.Filesystem`](../interface.md). No cgo, no root.
 
 ## Status
 
-| Read | Write | Format | Symlinks | On-disk format |
-|:--:|:--:|:--:|:--:|---|
-| ✅ | ✅ | ✅ | ✅ | Single-device, CRC32c (btrfs-progs ≥ 5.x) |
+| Read | Write | Format | Label | Symlinks | On-disk format |
+|:--:|:--:|:--:|:--:|:--:|---|
+| ✅ | ✅ | ✅ | ✅ | ✅ | Single-device, CRC32c (btrfs-progs ≥ 5.x) |
 
 ## Supported
 

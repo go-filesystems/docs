@@ -8,15 +8,17 @@ Implements [`filesystem.Filesystem`](../interface.md). No cgo, no root.
 
 ## Status
 
-| Read | Write | Format | Symlinks | On-disk format |
-|:--:|:--:|:--:|:--:|---|
-| ✅ | ✅ | ✅ | ✅ | XFS v5 (CRC32c, ftype) |
+| Read | Write | Format | Label | Symlinks | On-disk format |
+|:--:|:--:|:--:|:--:|:--:|---|
+| ✅ | ✅ | ✅ | ✅ | ✅ | XFS v5 (CRC32c, ftype) |
 
 ## Supported
 
 - Read/write files
 - Directories, rename, symlinks
 - MBR/GPT auto-detect
+- Volume label (`Labeller`)
+- Grow — shrink returns `ErrShrinkUnsupported`
 
 ## Install
 

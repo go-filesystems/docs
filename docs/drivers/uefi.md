@@ -11,12 +11,13 @@ Implements [`filesystem.Filesystem`](../interface.md). No cgo, no root.
 
 ## Status
 
-| Read | Write | Format | Symlinks | On-disk format |
-|:--:|:--:|:--:|:--:|---|
-| ✅ | ✅ | — | — | OVMF/EDK2 NvVar variable store (non-authenticated) |
+| Read | Write | Format | Label | Symlinks | On-disk format |
+|:--:|:--:|:--:|:--:|:--:|---|
+| ✅ | ✅ | ✅ | — | — | OVMF/EDK2 NvVar variable store (non-authenticated) |
 
 ## Supported
 
+- Create a fresh store (`Format` / `FormatOVMF`)
 - List / Get / Set / Delete UEFI variables (atomic rewrite)
 - Secure Boot key enrolment (PK, KEK, db, dbx)
 - Exposed via `filesystem.Filesystem` (variable = file)

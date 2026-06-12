@@ -8,9 +8,9 @@ Implements [`filesystem.Filesystem`](../interface.md). No cgo, no root.
 
 ## Status
 
-| Read | Write | Format | Symlinks | On-disk format |
-|:--:|:--:|:--:|:--:|---|
-| ✅ | ✅ | ✅ | — | Single pool / single vdev (test-oriented subset) |
+| Read | Write | Format | Label | Symlinks | On-disk format |
+|:--:|:--:|:--:|:--:|:--:|---|
+| ✅ | ✅ | ✅ | — | — | Single pool / single vdev (test-oriented subset) |
 
 ## Supported
 
@@ -18,6 +18,7 @@ Implements [`filesystem.Filesystem`](../interface.md). No cgo, no root.
 - Create pool image (`Format`)
 - Directories, rename
 - Pool info (`Info`)
+- Grow (`Resizer`) — shrink unsupported
 
 ## Not implemented
 
