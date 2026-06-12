@@ -1,0 +1,52 @@
+site_name: go-filesystems
+site_description: Pure-Go filesystem drivers — read & write disk images, no cgo, no root.
+site_url: https://go-filesystems.github.io/docs/
+repo_url: https://github.com/go-filesystems
+repo_name: go-filesystems
+edit_uri: ""
+
+theme:
+  name: material
+  logo: assets/logo.png
+  favicon: assets/logo.png
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: custom
+      toggle: { icon: material/weather-night, name: Dark mode }
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: custom
+      toggle: { icon: material/weather-sunny, name: Light mode }
+  features: [navigation.sections, navigation.top, content.code.copy, search.suggest]
+
+extra_css: [stylesheets/brand.css]
+extra:
+  version:
+    provider: mike
+
+markdown_extensions:
+  - admonition
+  - tables
+  - attr_list
+  - md_in_html
+  - pymdownx.superfences
+  - pymdownx.highlight
+
+nav:
+  - Home: index.md
+  - Interface: interface.md
+  - Drivers:
+      - Overview: drivers/index.md
+      - apfs: drivers/apfs.md
+      - btrfs: drivers/btrfs.md
+      - exfat: drivers/exfat.md
+      - ext4: drivers/ext4.md
+      - fat32: drivers/fat32.md
+      - ntfs: drivers/ntfs.md
+      - uefi: drivers/uefi.md
+      - ufs: drivers/ufs.md
+      - xfs: drivers/xfs.md
+      - zfs: drivers/zfs.md
