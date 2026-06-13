@@ -10,7 +10,7 @@ Implements [`filesystem.Filesystem`](../interface.md). No cgo, no root.
 
 | Read | Write | Format | Label | Symlinks | On-disk format |
 |:--:|:--:|:--:|:--:|:--:|---|
-| ✅ | ✕ | ✕ | — | ✅ | SquashFS 4.0 — read-only archive; gzip blocks + fragments |
+| ✅ | ✕ | ✅ | — | ✅ | SquashFS 4.0 read-only archive; gzip/xz/zstd/lzo/lz4 blocks + fragments |
 
 ## Supported
 
@@ -20,12 +20,13 @@ Implements [`filesystem.Filesystem`](../interface.md). No cgo, no root.
 - Multi-header directory listings
 - File data: block list (compressed / uncompressed / sparse) + tail-end fragments
 - Path resolution following intermediate and final symlinks
-- `gzip` (zlib-stream) and uncompressed blocks
+- Compression: `gzip` (zlib), `xz` (LZMA2), `zstd`, `lzo` (LZO1X), `lz4`, and uncompressed blocks
+- **Image creation** — `BuildFromDir` writes a SquashFS 4.0 image from a tree (gzip or uncompressed), readable by `unsquashfs`
 
 ## Not implemented
 
-- Write/format — SquashFS is a read-only format; mutators return `ErrReadOnly`
-- `xz` / `lz4` / `zstd` / `lzo` / `lzma` compression (`ErrUnsupportedCompression`)
+- In-place writes — the archive is immutable once written; mutators return `ErrReadOnly`. Writer omits tail-end fragment packing, xattrs, and non-zero uid/gid.
+- Legacy standalone `lzma` compression (`ErrUnsupportedCompression`); xz with BCJ filters
 - Extended attributes (xattr table)
 
 ## Install
