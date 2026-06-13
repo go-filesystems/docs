@@ -10,7 +10,7 @@ Implements [`filesystem.Filesystem`](../interface.md). No cgo, no root.
 
 | Read | Write | Format | Label | Symlinks | On-disk format |
 |:--:|:--:|:--:|:--:|:--:|---|
-| ✅ | ✕ | ✕ | — | ✅ | SquashFS 4.0 read-only archive; gzip/xz/zstd/lzo blocks + fragments |
+| ✅ | ✕ | ✕ | — | ✅ | SquashFS 4.0 read-only archive; gzip/xz/zstd/lzo/lz4 blocks + fragments |
 
 ## Supported
 
@@ -20,12 +20,12 @@ Implements [`filesystem.Filesystem`](../interface.md). No cgo, no root.
 - Multi-header directory listings
 - File data: block list (compressed / uncompressed / sparse) + tail-end fragments
 - Path resolution following intermediate and final symlinks
-- Compression: `gzip` (zlib), `xz` (LZMA2), `zstd`, `lzo` (LZO1X), and uncompressed blocks
+- Compression: `gzip` (zlib), `xz` (LZMA2), `zstd`, `lzo` (LZO1X), `lz4`, and uncompressed blocks
 
 ## Not implemented
 
 - Write/format — SquashFS is a read-only format; mutators return `ErrReadOnly`
-- `lz4` and standalone `lzma` compression (`ErrUnsupportedCompression`); xz with BCJ filters
+- Legacy standalone `lzma` compression (`ErrUnsupportedCompression`); xz with BCJ filters
 - Extended attributes (xattr table)
 
 ## Install
