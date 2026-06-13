@@ -9,7 +9,7 @@ The 12 filesystem drivers available today. **Read** = open & inspect · **Write*
 | <img src="../assets/fs/go-filesystems-exfat.png" width="28"> | [`exfat`](exfat.md) | ✅ | ✅ | ✅ | ✅ | ✕ | exFAT |
 | <img src="../assets/fs/go-filesystems-ext4.png" width="28"> | [`ext4`](ext4.md) | ✅ | ✅ | ✅ | ✅ | ✅ | ext4 — extents, 64-bit, flex_bg, dir htree, metadata_csum (CRC32c) |
 | <img src="../assets/fs/go-filesystems-fat32.png" width="28"> | [`fat32`](fat32.md) | ✅ | ✅ | ✅ | ✅ | ✕ | FAT32 |
-| <img src="../assets/fs/go-filesystems-iso9660.png" width="28"> | [`iso9660`](iso9660.md) | ✅ | ✕ | ✕ | — | ✕ | ISO 9660 / ECMA-119 base; Rock Ridge + Joliet planned |
+| <img src="../assets/fs/go-filesystems-iso9660.png" width="28"> | [`iso9660`](iso9660.md) | ✅ | ✕ | ✕ | — | ✅ | ISO 9660 / ECMA-119 + Rock Ridge (names/perms/symlinks); Joliet planned |
 | <img src="../assets/fs/go-filesystems-ntfs.png" width="28"> | [`ntfs`](ntfs.md) | ✅ | ✅ | ✅ | ✅ | ✕ | Minimal in-image blob model — NOT the real NTFS on-disk format |
 | <img src="../assets/fs/go-filesystems-squashfs.png" width="28"> | [`squashfs`](squashfs.md) | ✅ | ✕ | ✕ | — | ✅ | SquashFS 4.0 — read-only archive; gzip blocks + fragments |
 | <img src="../assets/fs/go-filesystems-uefi.png" width="28"> | [`uefi`](uefi.md) | ✅ | ✅ | ✅ | — | — | OVMF/EDK2 NvVar variable store; time-based authenticated writes |
