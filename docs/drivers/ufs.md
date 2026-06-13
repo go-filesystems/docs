@@ -10,7 +10,7 @@ Implements [`filesystem.Filesystem`](../interface.md). No cgo, no root.
 
 | Read | Write | Format | Label | Symlinks | On-disk format |
 |:--:|:--:|:--:|:--:|:--:|---|
-| ✅ | ✅ | ✅ | — | ✅ | UFS2 (FreeBSD 14.x); UFS1 not supported |
+| ✅ | ✅ | ✅ | — | ✅ | UFS2 (FreeBSD 14.x) read+write; UFS1 read |
 
 ## Supported
 

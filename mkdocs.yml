@@ -46,6 +46,7 @@ nav:
       - ext4: drivers/ext4.md
       - fat32: drivers/fat32.md
       - ntfs: drivers/ntfs.md
+      - squashfs: drivers/squashfs.md
       - uefi: drivers/uefi.md
       - ufs: drivers/ufs.md
       - xfs: drivers/xfs.md
