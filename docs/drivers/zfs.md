@@ -10,7 +10,7 @@ Implements [`filesystem.Filesystem`](../interface.md). No cgo, no root.
 
 | Read | Write | Format | Label | Symlinks | On-disk format |
 |:--:|:--:|:--:|:--:|:--:|---|
-| ✅ | ✅ | ✅ | — | — | Single pool / single vdev (test-oriented subset) |
+| ✅ | ✅ | ✅ | — | ✅ | Single pool, single-vdev writer (test-oriented subset); multi-vdev/RAID-Z read via `OpenFromDevices` |
 
 ## Supported
 
@@ -18,13 +18,20 @@ Implements [`filesystem.Filesystem`](../interface.md). No cgo, no root.
 - Create pool image (`Format`)
 - Directories, rename
 - Pool info (`Info`)
-- Grow (`Resizer`) — shrink unsupported
+- Grow / Shrink / Resize, including `ShrinkWithMode` (Rebuild / InPlace / Auto)
+- Snapshots (`Snapshot`, `OpenSnapshot`, `DestroySnapshot`) and clones (`Clone`, `Origin`)
+- Transparent decompress on read (lz4 / gzip / zstd / lzjb / zle)
+- Native encryption read (`OpenFromDeviceDatasetWithKey`, AES-CCM/GCM)
+- Symlinks and hardlinks; chmod/chown/chtimes (type-assert the optional interfaces)
+- Multi-vdev (mirror / RAID-Z) pools opened read via `OpenFromDevices`
 
 ## Not implemented
 
-- Snapshots & clones not implemented
-- Compression and data-block checksums not implemented
-- Single vdev only
+- The writer only targets a single dataset in a single-vdev pool (the reader
+  navigates nested datasets and multi-vdev/RAID-Z pools)
+- The writer does not compress or encrypt data blocks it produces
+- Snapshots/clones are eager block copies, not O(1) copy-on-write; no ACLs
+- A missing RAID-Z data leg is not yet reconstructed from parity
 
 ## Install
 

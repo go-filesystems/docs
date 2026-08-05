@@ -45,6 +45,8 @@ nav:
       - exfat: drivers/exfat.md
       - ext4: drivers/ext4.md
       - fat32: drivers/fat32.md
+      - ffs: drivers/ffs.md
+      - hfsplus: drivers/hfsplus.md
       - iso9660: drivers/iso9660.md
       - ntfs: drivers/ntfs.md
       - squashfs: drivers/squashfs.md

@@ -20,11 +20,15 @@ Implements [`filesystem.Filesystem`](../interface.md). No cgo, no root.
 - Read/write files (blob storage inside the image)
 - Directories, recursive delete, rename
 - In-image free-list reuse
+- In-image Grow / Shrink / Resize and compaction (`Compact`, `FragmentationStats`, `Layout`)
+- A separate read-only reader parses genuine on-disk NTFS: LZNT1 decompression, named
+  streams (ADS), `$REPARSE_POINT` symlinks/junctions, `$ATTRIBUTE_LIST`, volume label
 
 ## Not implemented
 
-- Does not implement real NTFS structures (MFT, ACLs, ADS, journaling)
-- No storage compaction
+- The NTFSIMG1 in-image driver does not implement real NTFS structures (MFT, ACLs, journaling)
+- The real on-disk reader is read-only and does not decode EFS-encrypted data
+- `Grow`/`Shrink`/`Resize`/`Compact` operate on the NTFSIMG1 image only, not real on-disk NTFS
 
 ## Install
 

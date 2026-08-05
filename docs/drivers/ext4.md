@@ -17,7 +17,7 @@ Implements [`filesystem.Filesystem`](../interface.md). No cgo, no root.
 - Read/write files (extents, sparse writes)
 - Directories, rename, symlinks
 - metadata_csum (CRC32c) writes
-- Online grow (`Grow`)
+- Online grow / shrink / resize (`Grow`, `Shrink`, `Resize`)
 - `CheckImage` / `RepairImage` hooks
 - `GetFlags`/`SetFlags` ioctls
 - MBR/GPT auto-detect
