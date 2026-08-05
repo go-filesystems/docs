@@ -10,13 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://go-filesystems.github.io/docs/0.1/drivers/ext4/">
+        <link rel="canonical" href="https://go-filesystems.github.io/docs/0.1/drivers/hfsplus/">
       
       
-        <link rel="prev" href="../exfat/">
+        <link rel="prev" href="../ffs/">
       
       
-        <link rel="next" href="../fat32/">
+        <link rel="next" href="../iso9660/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>ext4 - go-filesystems</title>
+        <title>hfsplus - go-filesystems</title>
       
     
     
@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#ext4" class="md-skip">
+        <a href="#hfsplus" class="md-skip">
           Skip to content
         </a>
       
@@ -119,7 +119,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              ext4
+              hfsplus
             
           </span>
         </div>
@@ -483,37 +483,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    ext4
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../ext4/" class="md-nav__link">
         
   
   
@@ -529,70 +502,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#status" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Status
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#supported" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Supported
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#not-implemented" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Not implemented
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#install" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Install
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -658,10 +567,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../hfsplus/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    hfsplus
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -677,6 +613,59 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#status" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Status
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#supported" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Supported
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#install" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Install
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -934,17 +923,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#not-implemented" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Not implemented
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#install" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -972,9 +950,9 @@
 
 
 
-<h1 id="ext4">ext4</h1>
-<p><img src="../../assets/fs/go-filesystems-ext4.png" width="110" align="right"></p>
-<p>Linux ext4 — extents, 64-bit, journaling, metadata_csum.</p>
+<h1 id="hfsplus">hfsplus</h1>
+<p><img src="../../assets/fs/go-filesystems-hfsplus.png" width="110" align="right"></p>
+<p>Apple HFS+ (Mac OS Extended) and its HFSX (case-sensitive) variant.</p>
 <p>Implements <a href="../../interface/"><code>filesystem.Filesystem</code></a>. No cgo, no root.</p>
 <h2 id="status">Status</h2>
 <table>
@@ -995,31 +973,23 @@
 <td style="text-align: center;">✅</td>
 <td style="text-align: center;">✅</td>
 <td style="text-align: center;">✅</td>
-<td>ext4 — extents, 64-bit, flex_bg, dir htree, metadata_csum (CRC32c)</td>
+<td>HFS+ / HFSX, big-endian catalog + extents-overflow B-trees</td>
 </tr>
 </tbody>
 </table>
 <h2 id="supported">Supported</h2>
 <ul>
-<li>Read/write files (extents, sparse writes)</li>
-<li>Directories, rename, symlinks</li>
-<li>metadata_csum (CRC32c) writes</li>
-<li>Online grow / shrink / resize (<code>Grow</code>, <code>Shrink</code>, <code>Resize</code>)</li>
-<li><code>CheckImage</code> / <code>RepairImage</code> hooks</li>
-<li><code>GetFlags</code>/<code>SetFlags</code> ioctls</li>
+<li>Read/write files</li>
+<li>Directories, rename</li>
+<li><code>SetLabel</code> / <code>Symlink</code> / <code>Truncate</code> (optional <code>Labeller</code> / <code>Symlinker</code> / <code>Truncater</code> capabilities)</li>
 <li>MBR/GPT auto-detect</li>
 </ul>
-<h2 id="not-implemented">Not implemented</h2>
-<ul>
-<li>Some cross-check tests require <code>mke2fs</code></li>
-<li>Not every kernel ioctl / obscure feature is implemented</li>
-</ul>
 <h2 id="install">Install</h2>
-<div class="highlight"><pre><span></span><code>go<span class="w"> </span>get<span class="w"> </span>github.com/go-filesystems/ext4
+<div class="highlight"><pre><span></span><code>go<span class="w"> </span>get<span class="w"> </span>github.com/go-filesystems/hfsplus
 </code></pre></div>
 <ul>
-<li>Source: <a href="https://github.com/go-filesystems/ext4">https://github.com/go-filesystems/ext4</a></li>
-<li>API reference: <a href="https://pkg.go.dev/github.com/go-filesystems/ext4">https://pkg.go.dev/github.com/go-filesystems/ext4</a></li>
+<li>Source: <a href="https://github.com/go-filesystems/hfsplus">https://github.com/go-filesystems/hfsplus</a></li>
+<li>API reference: <a href="https://pkg.go.dev/github.com/go-filesystems/hfsplus">https://pkg.go.dev/github.com/go-filesystems/hfsplus</a></li>
 </ul>
 <div class="admonition note">
 <p class="admonition-title">Note</p>

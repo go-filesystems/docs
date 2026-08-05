@@ -10,13 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://go-filesystems.github.io/docs/0.1/drivers/ext4/">
+        <link rel="canonical" href="https://go-filesystems.github.io/docs/0.1/drivers/ffs/">
       
       
-        <link rel="prev" href="../exfat/">
+        <link rel="prev" href="../fat32/">
       
       
-        <link rel="next" href="../fat32/">
+        <link rel="next" href="../hfsplus/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>ext4 - go-filesystems</title>
+        <title>ffs - go-filesystems</title>
       
     
     
@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#ext4" class="md-skip">
+        <a href="#ffs" class="md-skip">
           Skip to content
         </a>
       
@@ -119,7 +119,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              ext4
+              ffs
             
           </span>
         </div>
@@ -483,6 +483,62 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../ext4/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ext4
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../fat32/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    fat32
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -502,7 +558,7 @@
   <span class="md-ellipsis">
     
   
-    ext4
+    ffs
   
 
     
@@ -520,7 +576,7 @@
   <span class="md-ellipsis">
     
   
-    ext4
+    ffs
   
 
     
@@ -568,17 +624,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#not-implemented" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Not implemented
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#install" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -593,62 +638,6 @@
   
 </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../fat32/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    fat32
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../ffs/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    ffs
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -934,17 +923,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#not-implemented" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Not implemented
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#install" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -972,9 +950,10 @@
 
 
 
-<h1 id="ext4">ext4</h1>
-<p><img src="../../assets/fs/go-filesystems-ext4.png" width="110" align="right"></p>
-<p>Linux ext4 — extents, 64-bit, journaling, metadata_csum.</p>
+<h1 id="ffs">ffs</h1>
+<p><img src="../../assets/fs/go-filesystems-ffs.png" width="110" align="right"></p>
+<p>NetBSD/OpenBSD Berkeley Fast File System (FFS) — a thin re-export of
+<a href="../ufs/"><code>ufs</code></a>, since FFSv1/FFSv2 are the same on-disk format as UFS1/UFS2.</p>
 <p>Implements <a href="../../interface/"><code>filesystem.Filesystem</code></a>. No cgo, no root.</p>
 <h2 id="status">Status</h2>
 <table>
@@ -993,37 +972,26 @@
 <td style="text-align: center;">✅</td>
 <td style="text-align: center;">✅</td>
 <td style="text-align: center;">✅</td>
+<td style="text-align: center;">—</td>
 <td style="text-align: center;">✅</td>
-<td style="text-align: center;">✅</td>
-<td>ext4 — extents, 64-bit, flex_bg, dir htree, metadata_csum (CRC32c)</td>
+<td>NetBSD/OpenBSD FFSv1/FFSv2 (= UFS1/UFS2), via the <code>ufs</code> driver</td>
 </tr>
 </tbody>
 </table>
 <h2 id="supported">Supported</h2>
-<ul>
-<li>Read/write files (extents, sparse writes)</li>
-<li>Directories, rename, symlinks</li>
-<li>metadata_csum (CRC32c) writes</li>
-<li>Online grow / shrink / resize (<code>Grow</code>, <code>Shrink</code>, <code>Resize</code>)</li>
-<li><code>CheckImage</code> / <code>RepairImage</code> hooks</li>
-<li><code>GetFlags</code>/<code>SetFlags</code> ioctls</li>
-<li>MBR/GPT auto-detect</li>
-</ul>
-<h2 id="not-implemented">Not implemented</h2>
-<ul>
-<li>Some cross-check tests require <code>mke2fs</code></li>
-<li>Not every kernel ioctl / obscure feature is implemented</li>
-</ul>
+<p>Everything the <code>ufs</code> driver provides, under an import path that matches how
+NetBSD/OpenBSD callers think of the format (<code>ffs.OpenFile</code>, <code>ffs.Open</code>,
+<code>ffs.OpenRW</code> — thin aliases of the <code>ufs</code> entry points).</p>
 <h2 id="install">Install</h2>
-<div class="highlight"><pre><span></span><code>go<span class="w"> </span>get<span class="w"> </span>github.com/go-filesystems/ext4
+<div class="highlight"><pre><span></span><code>go<span class="w"> </span>get<span class="w"> </span>github.com/go-filesystems/ffs
 </code></pre></div>
 <ul>
-<li>Source: <a href="https://github.com/go-filesystems/ext4">https://github.com/go-filesystems/ext4</a></li>
-<li>API reference: <a href="https://pkg.go.dev/github.com/go-filesystems/ext4">https://pkg.go.dev/github.com/go-filesystems/ext4</a></li>
+<li>Source: <a href="https://github.com/go-filesystems/ffs">https://github.com/go-filesystems/ffs</a></li>
+<li>API reference: <a href="https://pkg.go.dev/github.com/go-filesystems/ffs">https://pkg.go.dev/github.com/go-filesystems/ffs</a></li>
 </ul>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>See the module's README for full, up-to-date details.</p>
+<p>See <a href="../ufs/"><code>ufs</code></a> and the module's README for full, up-to-date details.</p>
 </div>
 
 

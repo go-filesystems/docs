@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../../assets/logo.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
@@ -31,7 +31,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -542,6 +542,62 @@
   
   
     <li class="md-nav__item">
+      <a href="../ffs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ffs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../hfsplus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    hfsplus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../iso9660/" class="md-nav__link">
         
   
@@ -952,11 +1008,15 @@
 <li>Read/write files (blob storage inside the image)</li>
 <li>Directories, recursive delete, rename</li>
 <li>In-image free-list reuse</li>
+<li>In-image Grow / Shrink / Resize and compaction (<code>Compact</code>, <code>FragmentationStats</code>, <code>Layout</code>)</li>
+<li>A separate read-only reader parses genuine on-disk NTFS: LZNT1 decompression, named
+  streams (ADS), <code>$REPARSE_POINT</code> symlinks/junctions, <code>$ATTRIBUTE_LIST</code>, volume label</li>
 </ul>
 <h2 id="not-implemented">Not implemented</h2>
 <ul>
-<li>Does not implement real NTFS structures (MFT, ACLs, ADS, journaling)</li>
-<li>No storage compaction</li>
+<li>The NTFSIMG1 in-image driver does not implement real NTFS structures (MFT, ACLs, journaling)</li>
+<li>The real on-disk reader is read-only and does not decode EFS-encrypted data</li>
+<li><code>Grow</code>/<code>Shrink</code>/<code>Resize</code>/<code>Compact</code> operate on the NTFSIMG1 image only, not real on-disk NTFS</li>
 </ul>
 <h2 id="install">Install</h2>
 <div class="highlight"><pre><span></span><code>go<span class="w"> </span>get<span class="w"> </span>github.com/go-filesystems/ntfs
@@ -1027,7 +1087,7 @@
       <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.top", "content.code.copy", "search.suggest"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
       
     
   </body>

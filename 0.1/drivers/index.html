@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../assets/logo.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
@@ -31,7 +31,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -552,6 +552,62 @@
   
   
     <li class="md-nav__item">
+      <a href="ffs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ffs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="hfsplus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    hfsplus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="iso9660/" class="md-nav__link">
         
   
@@ -784,7 +840,10 @@
 
 
 <h1 id="drivers">Drivers</h1>
-<p>The 12 filesystem drivers available today.</p>
+<p>The 15 filesystem drivers available today (plus <code>oci</code>, a read-only
+image-as-filesystem overlay, and <code>detect</code>, a type-probing dispatch registry —
+both listed separately below since neither targets an on-disk <em>format</em> in the
+same sense as the rows in this table).</p>
 <table>
 <thead>
 <tr>
@@ -813,7 +872,7 @@
 <td style="text-align: center;">✅</td>
 <td style="text-align: center;">—</td>
 <td style="text-align: center;">✅</td>
-<td style="text-align: center;">✕</td>
+<td style="text-align: center;">✅</td>
 <td>Real APFS on-disk (kext-mountable), GPT-aware</td>
 <td>macOS / iOS</td>
 </tr>
@@ -874,6 +933,34 @@
 <td>cross-platform</td>
 </tr>
 <tr>
+<td><img src="../assets/fs/go-filesystems-ffs.png" width="28"></td>
+<td><a href="ffs/"><code>ffs</code></a></td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✕</td>
+<td style="text-align: center;">✕</td>
+<td style="text-align: center;">—</td>
+<td>NetBSD/OpenBSD FFSv1/FFSv2 — thin re-export of <code>ufs</code></td>
+<td>BSD</td>
+</tr>
+<tr>
+<td><img src="../assets/fs/go-filesystems-hfsplus.png" width="28"></td>
+<td><a href="hfsplus/"><code>hfsplus</code></a></td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">—</td>
+<td>HFS+ / HFSX (Mac OS Extended), big-endian catalog + extents-overflow B-trees</td>
+<td>macOS (legacy)</td>
+</tr>
+<tr>
 <td><img src="../assets/fs/go-filesystems-iso9660.png" width="28"></td>
 <td><a href="iso9660/"><code>iso9660</code></a></td>
 <td style="text-align: center;">✅</td>
@@ -898,7 +985,7 @@
 <td style="text-align: center;">—</td>
 <td style="text-align: center;">—</td>
 <td style="text-align: center;">—</td>
-<td>Minimal in-image blob model — NOT the real NTFS on-disk format</td>
+<td>Minimal in-image blob model — NOT the real NTFS on-disk format; a separate read-only reader parses genuine NTFS</td>
 <td>Windows</td>
 </tr>
 <tr>
@@ -951,7 +1038,7 @@
 <td style="text-align: center;">✅</td>
 <td style="text-align: center;">✅</td>
 <td style="text-align: center;">✅</td>
-<td style="text-align: center;">✕</td>
+<td style="text-align: center;">✅</td>
 <td style="text-align: center;">—</td>
 <td style="text-align: center;">✕</td>
 <td>XFS v5 (CRC32c, ftype)</td>
@@ -964,16 +1051,37 @@
 <td style="text-align: center;">✅</td>
 <td style="text-align: center;">✅</td>
 <td style="text-align: center;">—</td>
-<td style="text-align: center;">—</td>
+<td style="text-align: center;">✅</td>
 <td style="text-align: center;">✕</td>
-<td style="text-align: center;">✕</td>
-<td style="text-align: center;">✕</td>
-<td>Single pool / single vdev (test-oriented subset)</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅ read-only</td>
+<td>Single pool, single-vdev writer (multi-vdev/RAID-Z read-only)</td>
 <td>illumos / BSD / Linux</td>
+</tr>
+<tr>
+<td><img src="../assets/fs/go-filesystems.png" width="28"></td>
+<td><a href="https://github.com/go-filesystems/oci"><code>oci</code></a></td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✕</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">—</td>
+<td>OCI/Docker image layers merged read-only (whiteouts, opaque dirs, hardlinks)</td>
+<td>any (image, not disk)</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Legend:</strong> ✅ supported by the driver · ✕ not yet implemented (the format has the feature) · — not applicable. <strong>Read</strong> = open &amp; inspect · <strong>Write</strong> = mutate in place · <strong>Format</strong> = create a fresh image. Quota / Snapshots / Encryption reflect <strong>driver</strong> support.</p>
+<p><strong>Legend:</strong> ✅ supported by the driver · ✕ not yet implemented (the format has
+the feature) · — not applicable. <strong>Read</strong> = open &amp; inspect · <strong>Write</strong> =
+mutate in place · <strong>Format</strong> = create a fresh image. Quota / Snapshots /
+Encryption reflect <strong>driver</strong> support, not just the on-disk format's
+capability.</p>
+<p>Also in the org: <a href="https://github.com/go-filesystems/detect"><code>detect</code></a>, a
+<code>blkid</code>-style type prober and driver-opener registry that dispatches to the
+drivers above — it isn't an on-disk format itself, so it has no row.</p>
 
 
 
@@ -1032,7 +1140,7 @@
       <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.top", "content.code.copy", "search.suggest"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
       
     
   </body>

@@ -21,7 +21,7 @@
       
       
       <link rel="icon" href="../../assets/logo.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
@@ -29,7 +29,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -540,6 +540,62 @@
   
   
     <li class="md-nav__item">
+      <a href="../ffs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ffs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../hfsplus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    hfsplus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../iso9660/" class="md-nav__link">
         
   
@@ -936,8 +992,8 @@
 <td style="text-align: center;">✅</td>
 <td style="text-align: center;">✅</td>
 <td style="text-align: center;">—</td>
-<td style="text-align: center;">—</td>
-<td>Single pool / single vdev (test-oriented subset)</td>
+<td style="text-align: center;">✅</td>
+<td>Single pool, single-vdev writer (test-oriented subset); multi-vdev/RAID-Z read via <code>OpenFromDevices</code></td>
 </tr>
 </tbody>
 </table>
@@ -947,13 +1003,20 @@
 <li>Create pool image (<code>Format</code>)</li>
 <li>Directories, rename</li>
 <li>Pool info (<code>Info</code>)</li>
-<li>Grow (<code>Resizer</code>) — shrink unsupported</li>
+<li>Grow / Shrink / Resize, including <code>ShrinkWithMode</code> (Rebuild / InPlace / Auto)</li>
+<li>Snapshots (<code>Snapshot</code>, <code>OpenSnapshot</code>, <code>DestroySnapshot</code>) and clones (<code>Clone</code>, <code>Origin</code>)</li>
+<li>Transparent decompress on read (lz4 / gzip / zstd / lzjb / zle)</li>
+<li>Native encryption read (<code>OpenFromDeviceDatasetWithKey</code>, AES-CCM/GCM)</li>
+<li>Symlinks and hardlinks; chmod/chown/chtimes (type-assert the optional interfaces)</li>
+<li>Multi-vdev (mirror / RAID-Z) pools opened read via <code>OpenFromDevices</code></li>
 </ul>
 <h2 id="not-implemented">Not implemented</h2>
 <ul>
-<li>Snapshots &amp; clones not implemented</li>
-<li>Compression and data-block checksums not implemented</li>
-<li>Single vdev only</li>
+<li>The writer only targets a single dataset in a single-vdev pool (the reader
+  navigates nested datasets and multi-vdev/RAID-Z pools)</li>
+<li>The writer does not compress or encrypt data blocks it produces</li>
+<li>Snapshots/clones are eager block copies, not O(1) copy-on-write; no ACLs</li>
+<li>A missing RAID-Z data leg is not yet reconstructed from parity</li>
 </ul>
 <h2 id="install">Install</h2>
 <div class="highlight"><pre><span></span><code>go<span class="w"> </span>get<span class="w"> </span>github.com/go-filesystems/zfs
@@ -1024,7 +1087,7 @@
       <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.top", "content.code.copy", "search.suggest"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
       
     
   </body>

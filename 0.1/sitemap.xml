@@ -2,62 +2,70 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://go-filesystems.github.io/docs/0.1/</loc>
-         <lastmod>2026-07-03</lastmod>
+         <lastmod>2026-08-05</lastmod>
     </url>
     <url>
          <loc>https://go-filesystems.github.io/docs/0.1/interface/</loc>
-         <lastmod>2026-07-03</lastmod>
+         <lastmod>2026-08-05</lastmod>
     </url>
     <url>
          <loc>https://go-filesystems.github.io/docs/0.1/drivers/</loc>
-         <lastmod>2026-07-03</lastmod>
+         <lastmod>2026-08-05</lastmod>
     </url>
     <url>
          <loc>https://go-filesystems.github.io/docs/0.1/drivers/apfs/</loc>
-         <lastmod>2026-07-03</lastmod>
+         <lastmod>2026-08-05</lastmod>
     </url>
     <url>
          <loc>https://go-filesystems.github.io/docs/0.1/drivers/btrfs/</loc>
-         <lastmod>2026-07-03</lastmod>
+         <lastmod>2026-08-05</lastmod>
     </url>
     <url>
          <loc>https://go-filesystems.github.io/docs/0.1/drivers/exfat/</loc>
-         <lastmod>2026-07-03</lastmod>
+         <lastmod>2026-08-05</lastmod>
     </url>
     <url>
          <loc>https://go-filesystems.github.io/docs/0.1/drivers/ext4/</loc>
-         <lastmod>2026-07-03</lastmod>
+         <lastmod>2026-08-05</lastmod>
     </url>
     <url>
          <loc>https://go-filesystems.github.io/docs/0.1/drivers/fat32/</loc>
-         <lastmod>2026-07-03</lastmod>
+         <lastmod>2026-08-05</lastmod>
+    </url>
+    <url>
+         <loc>https://go-filesystems.github.io/docs/0.1/drivers/ffs/</loc>
+         <lastmod>2026-08-05</lastmod>
+    </url>
+    <url>
+         <loc>https://go-filesystems.github.io/docs/0.1/drivers/hfsplus/</loc>
+         <lastmod>2026-08-05</lastmod>
     </url>
     <url>
          <loc>https://go-filesystems.github.io/docs/0.1/drivers/iso9660/</loc>
-         <lastmod>2026-07-03</lastmod>
+         <lastmod>2026-08-05</lastmod>
     </url>
     <url>
          <loc>https://go-filesystems.github.io/docs/0.1/drivers/ntfs/</loc>
-         <lastmod>2026-07-03</lastmod>
+         <lastmod>2026-08-05</lastmod>
     </url>
     <url>
          <loc>https://go-filesystems.github.io/docs/0.1/drivers/squashfs/</loc>
-         <lastmod>2026-07-03</lastmod>
+         <lastmod>2026-08-05</lastmod>
     </url>
     <url>
          <loc>https://go-filesystems.github.io/docs/0.1/drivers/uefi/</loc>
-         <lastmod>2026-07-03</lastmod>
+         <lastmod>2026-08-05</lastmod>
     </url>
     <url>
          <loc>https://go-filesystems.github.io/docs/0.1/drivers/ufs/</loc>
-         <lastmod>2026-07-03</lastmod>
+         <lastmod>2026-08-05</lastmod>
     </url>
     <url>
          <loc>https://go-filesystems.github.io/docs/0.1/drivers/xfs/</loc>
-         <lastmod>2026-07-03</lastmod>
+         <lastmod>2026-08-05</lastmod>
     </url>
     <url>
          <loc>https://go-filesystems.github.io/docs/0.1/drivers/zfs/</loc>
-         <lastmod>2026-07-03</lastmod>
+         <lastmod>2026-08-05</lastmod>
     </url>
 </urlset>
