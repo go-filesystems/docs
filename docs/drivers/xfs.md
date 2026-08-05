@@ -18,7 +18,11 @@ Implements [`filesystem.Filesystem`](../interface.md). No cgo, no root.
 - Directories, rename, symlinks
 - MBR/GPT auto-detect
 - Volume label (`Labeller`)
-- Grow — shrink returns `ErrShrinkUnsupported`
+- Grow / Resize (whole-AG and partial last-AG growth) — shrink returns `ErrShrinkUnsupported`
+- Reflink / copy-on-write clones (`FormatConfig.Reflink`, `FS.Reflink`)
+- Quotas — user / group / project (`FormatConfig.Quota`), kept consistent by an inode-scan quotacheck
+- Extended metadata: `ExtendedStat`, `Chown`, `Chmod`, `Chtimes`, `Truncate`, `Link` (hardlinks)
+- Layered backends via `OpenFromDevice` (LUKS / qcow2 / in-memory)
 
 ## Install
 
