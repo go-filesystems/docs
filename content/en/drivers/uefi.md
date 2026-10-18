@@ -1,33 +1,39 @@
-# uefi
+---
+title: "uefi"
+weight: 140
+---
+
+# uefi {#uefi}
 
 <img src="../../assets/fs/go-filesystems-uefi.png" width="110" align="right">
 
 EFI System Partition (FAT-based).
 
-Implements [`filesystem.Filesystem`](../interface.md). No cgo, no root.
+Implements [`filesystem.Filesystem`]({{< relref "../interface.md" >}}). No cgo, no root.
 
-!!! warning
-    A UEFI variable store, not a POSIX filesystem.
+{{< callout type="warning" >}}
+A UEFI variable store, not a POSIX filesystem.
+{{< /callout >}}
 
-## Status
+## Status {#status}
 
 | Read | Write | Format | Label | Symlinks | On-disk format |
 |:--:|:--:|:--:|:--:|:--:|---|
 | ✅ | ✅ | ✅ | — | — | OVMF/EDK2 NvVar variable store (non-authenticated) |
 
-## Supported
+## Supported {#supported}
 
 - Create a fresh store (`Format` / `FormatOVMF`)
 - List / Get / Set / Delete UEFI variables (atomic rewrite)
 - Secure Boot key enrolment (PK, KEK, db, dbx)
 - Exposed via `filesystem.Filesystem` (variable = file)
 
-## Not implemented
+## Not implemented {#not-implemented}
 
 - Time-based authenticated writes not supported
 - `MkDir` / `DeleteDir` / `ReadLink` return "not supported" (a store, not a tree)
 
-## Install
+## Install {#install}
 
 ```bash
 go get github.com/go-filesystems/uefi
@@ -36,5 +42,6 @@ go get github.com/go-filesystems/uefi
 - Source: <https://github.com/go-filesystems/uefi>
 - API reference: <https://pkg.go.dev/github.com/go-filesystems/uefi>
 
-!!! note
-    See the module's README for full, up-to-date details.
+{{< callout type="info" >}}
+See the module's README for full, up-to-date details.
+{{< /callout >}}

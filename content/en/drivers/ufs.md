@@ -1,29 +1,34 @@
-# ufs
+---
+title: "ufs"
+weight: 150
+---
+
+# ufs {#ufs}
 
 <img src="../../assets/fs/go-filesystems-ufs.png" width="110" align="right">
 
 Unix File System (BSD).
 
-Implements [`filesystem.Filesystem`](../interface.md). No cgo, no root.
+Implements [`filesystem.Filesystem`]({{< relref "../interface.md" >}}). No cgo, no root.
 
-## Status
+## Status {#status}
 
 | Read | Write | Format | Label | Symlinks | On-disk format |
 |:--:|:--:|:--:|:--:|:--:|---|
 | ✅ | ✅ | ✅ | — | ✅ | UFS2 (FreeBSD 14.x) read+write; UFS1 read |
 
-## Supported
+## Supported {#supported}
 
 - Read + write (`OpenRW`) and fresh format (`Mkfs`)
 - Superblock/inode decode, directory walk
 - Direct + single/double indirect blocks
 - Inline & spilled symlinks, sparse holes
 
-## Not implemented
+## Not implemented {#not-implemented}
 
 - Triple-indirect blocks unsupported (`ErrUnsupportedIndirect`)
 
-## Install
+## Install {#install}
 
 ```bash
 go get github.com/go-filesystems/ufs
@@ -32,5 +37,6 @@ go get github.com/go-filesystems/ufs
 - Source: <https://github.com/go-filesystems/ufs>
 - API reference: <https://pkg.go.dev/github.com/go-filesystems/ufs>
 
-!!! note
-    See the module's README for full, up-to-date details.
+{{< callout type="info" >}}
+See the module's README for full, up-to-date details.
+{{< /callout >}}
