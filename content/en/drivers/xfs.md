@@ -1,18 +1,23 @@
-# xfs
+---
+title: "xfs"
+weight: 160
+---
+
+# xfs {#xfs}
 
 <img src="../../assets/fs/go-filesystems-xfs.png" width="110" align="right">
 
 High-performance journaling filesystem.
 
-Implements [`filesystem.Filesystem`](../interface.md). No cgo, no root.
+Implements [`filesystem.Filesystem`]({{< relref "../interface.md" >}}). No cgo, no root.
 
-## Status
+## Status {#status}
 
 | Read | Write | Format | Label | Symlinks | On-disk format |
 |:--:|:--:|:--:|:--:|:--:|---|
 | ✅ | ✅ | ✅ | ✅ | ✅ | XFS v5 (CRC32c, ftype) |
 
-## Supported
+## Supported {#supported}
 
 - Read/write files
 - Directories, rename, symlinks
@@ -24,7 +29,7 @@ Implements [`filesystem.Filesystem`](../interface.md). No cgo, no root.
 - Extended metadata: `ExtendedStat`, `Chown`, `Chmod`, `Chtimes`, `Truncate`, `Link` (hardlinks)
 - Layered backends via `OpenFromDevice` (LUKS / qcow2 / in-memory)
 
-## Install
+## Install {#install}
 
 ```bash
 go get github.com/go-filesystems/xfs
@@ -33,5 +38,6 @@ go get github.com/go-filesystems/xfs
 - Source: <https://github.com/go-filesystems/xfs>
 - API reference: <https://pkg.go.dev/github.com/go-filesystems/xfs>
 
-!!! note
-    See the module's README for full, up-to-date details.
+{{< callout type="info" >}}
+See the module's README for full, up-to-date details.
+{{< /callout >}}

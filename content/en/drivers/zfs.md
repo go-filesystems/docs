@@ -1,18 +1,23 @@
-# zfs
+---
+title: "zfs"
+weight: 170
+---
+
+# zfs {#zfs}
 
 <img src="../../assets/fs/go-filesystems-zfs.png" width="110" align="right">
 
 Copy-on-write pooled storage filesystem.
 
-Implements [`filesystem.Filesystem`](../interface.md). No cgo, no root.
+Implements [`filesystem.Filesystem`]({{< relref "../interface.md" >}}). No cgo, no root.
 
-## Status
+## Status {#status}
 
 | Read | Write | Format | Label | Symlinks | On-disk format |
 |:--:|:--:|:--:|:--:|:--:|---|
 | ✅ | ✅ | ✅ | — | ✅ | Single pool, single-vdev writer (test-oriented subset); multi-vdev/RAID-Z read via `OpenFromDevices` |
 
-## Supported
+## Supported {#supported}
 
 - Read/write basic file I/O on a ZPL dataset
 - Create pool image (`Format`)
@@ -25,7 +30,7 @@ Implements [`filesystem.Filesystem`](../interface.md). No cgo, no root.
 - Symlinks and hardlinks; chmod/chown/chtimes (type-assert the optional interfaces)
 - Multi-vdev (mirror / RAID-Z) pools opened read via `OpenFromDevices`
 
-## Not implemented
+## Not implemented {#not-implemented}
 
 - The writer only targets a single dataset in a single-vdev pool (the reader
   navigates nested datasets and multi-vdev/RAID-Z pools)
@@ -33,7 +38,7 @@ Implements [`filesystem.Filesystem`](../interface.md). No cgo, no root.
 - Snapshots/clones are eager block copies, not O(1) copy-on-write; no ACLs
 - A missing RAID-Z data leg is not yet reconstructed from parity
 
-## Install
+## Install {#install}
 
 ```bash
 go get github.com/go-filesystems/zfs
@@ -42,5 +47,6 @@ go get github.com/go-filesystems/zfs
 - Source: <https://github.com/go-filesystems/zfs>
 - API reference: <https://pkg.go.dev/github.com/go-filesystems/zfs>
 
-!!! note
-    See the module's README for full, up-to-date details.
+{{< callout type="info" >}}
+See the module's README for full, up-to-date details.
+{{< /callout >}}

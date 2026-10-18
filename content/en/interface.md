@@ -1,4 +1,9 @@
-# Interface
+---
+title: "Interface"
+weight: 20
+---
+
+# Interface {#interface}
 
 Every driver implements the contract defined in
 [`go-filesystems/interface`](https://github.com/go-filesystems/interface) (package `filesystem`):
