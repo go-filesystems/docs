@@ -26,7 +26,7 @@ same sense as the rows in this table).
 | <img src="../assets/fs/go-filesystems-ufs.png" width="28"> | [`ufs`]({{< relref "ufs.md" >}}) | ✅ | ✅ | ✅ | — | ✅ | ✕ | ✕ | — | UFS2 (FreeBSD 14.x) read+write; UFS1 read; NetBSD/OpenBSD FFSv1/FFSv2 (via `ffs` alias module) | BSD |
 | <img src="../assets/fs/go-filesystems-xfs.png" width="28"> | [`xfs`]({{< relref "xfs.md" >}}) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — | ✕ | XFS v5 (CRC32c, ftype) | Linux |
 | <img src="../assets/fs/go-filesystems-zfs.png" width="28"> | [`zfs`]({{< relref "zfs.md" >}}) | ✅ | ✅ | ✅ | — | ✅ | ✕ | ✅ | ✅ read-only | Single pool, single-vdev writer (multi-vdev/RAID-Z read-only) | illumos / BSD / Linux |
-| <img src="../assets/fs/go-filesystems.png" width="28"> | [`oci`](https://github.com/go-filesystems/oci) | ✅ | ✕ | — | — | ✅ | — | — | — | OCI/Docker image layers merged read-only (whiteouts, opaque dirs, hardlinks) | any (image, not disk) |
+| | [`oci`](https://github.com/go-filesystems/oci) | ✅ | ✕ | — | — | ✅ | — | — | — | OCI/Docker image layers merged read-only (whiteouts, opaque dirs, hardlinks) | any (image, not disk) |
 
 **Legend:** ✅ supported by the driver · ✕ not yet implemented (the format has
 the feature) · — not applicable. **Read** = open & inspect · **Write** =
