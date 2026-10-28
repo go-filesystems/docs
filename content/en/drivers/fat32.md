@@ -24,6 +24,10 @@ Implements [`filesystem.Filesystem`]({{< relref "../interface.md" >}}). No cgo, 
 - Bare images + MBR/GPT
 - Volume label (`Labeller`)
 - Resize (`filesystem.Resizer`)
+- Format to a path (`Format`) or into any `io.ReaderAt` + `io.WriterAt`, such as
+  a buffer in memory (`FormatImage`) — what the
+  [playground]({{< relref "../playground.md" >}}) uses to make its sample image
+  in the browser
 
 ## Not implemented {#not-implemented}
 
