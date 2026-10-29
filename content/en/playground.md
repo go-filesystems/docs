@@ -38,6 +38,16 @@ the form stays to try again.
 APFS FileVault containers are not supported yet: go-filesystems/apfs cannot read
 one through its decrypted device so far, and that is being fixed there first.
 
+### Open in the explorer {#explorer}
+
+Once an image is open, **open in the explorer** loads the
+[go-fileshare explorer](https://github.com/go-fileshare/explorer) in a same-origin
+frame. It is fetched only then (4.1 MB compressed), and browses the image the way it
+browses a fileshare server, over WebDAV. None of its requests reach a network. The
+page hands each one to the engine, which answers it with
+[go-filesystems/webdav](https://github.com/go-filesystems/webdav) over the open
+image, read-only. Closing the explorer unloads it.
+
 ## How it works {#how-it-works}
 
 - The Go engine runs in a **Web Worker**. Its `io.ReaderAt` reads the dropped
