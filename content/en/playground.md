@@ -16,17 +16,27 @@ with `fat32.FormatImage`, writes a few files into it, opens it again through
 
 ## What it opens {#what-it-opens}
 
-A filesystem at offset 0 of the file — a filesystem image, not a partitioned
-disk — detected by [`detect`](https://github.com/go-filesystems/detect) and opened
-by the drivers that take an `io.ReaderAt`:
+| Filesystem | Found | Viewing and downloading |
+|---|---|---|
+| [fat32]({{< relref "drivers/fat32.md" >}}), [exfat]({{< relref "drivers/exfat.md" >}}), [ext4]({{< relref "drivers/ext4.md" >}}), [iso9660]({{< relref "drivers/iso9660.md" >}}), [squashfs]({{< relref "drivers/squashfs.md" >}}) | at offset 0, by [`detect`](https://github.com/go-filesystems/detect) | streamed in 4 MiB pieces (`filesystem.Opener`) |
+| [ntfs]({{< relref "drivers/ntfs.md" >}}), [hfsplus]({{< relref "drivers/hfsplus.md" >}}), [ufs]({{< relref "drivers/ufs.md" >}}) | at offset 0, by `detect` | read whole, files up to 64 MiB |
+| [apfs]({{< relref "drivers/apfs.md" >}}), [btrfs]({{< relref "drivers/btrfs.md" >}}), [xfs]({{< relref "drivers/xfs.md" >}}), [zfs]({{< relref "drivers/zfs.md" >}}) | in a disk image's GPT or MBR table, through a read-only block device | read whole, files up to 64 MiB |
 
-| Filesystem | Viewing and downloading |
-|---|---|
-| [fat32]({{< relref "drivers/fat32.md" >}}), [exfat]({{< relref "drivers/exfat.md" >}}), [ext4]({{< relref "drivers/ext4.md" >}}), [iso9660]({{< relref "drivers/iso9660.md" >}}), [squashfs]({{< relref "drivers/squashfs.md" >}}) | streamed in 4 MiB pieces (`filesystem.Opener`) |
-| [ntfs]({{< relref "drivers/ntfs.md" >}}), [hfsplus]({{< relref "drivers/hfsplus.md" >}}), [ufs]({{< relref "drivers/ufs.md" >}}) | read whole, files up to 64 MiB |
+**The Filesystem list** chooses the driver. *Detect it*, the default, asks
+`detect`; when nothing opens at offset 0, the four disk-image drivers are tried in
+turn. Choosing a filesystem forces that driver, for an image `detect` gets wrong
+or cannot recognise.
 
-apfs, btrfs, xfs and zfs open a partition of a disk image by path rather than an
-`io.ReaderAt`, so they are not in the playground yet.
+### Encrypted images {#encrypted}
+
+A **LUKS1 or LUKS2** container ([go-fde/luks](https://github.com/go-fde/luks)) is
+recognised by its header, and the page asks for its password. The engine unlocks
+it and opens the filesystem in the payload: detected, or the one chosen in the
+list. The facts then read e.g. `ext4 in LUKS`. A wrong password is refused, and
+the form stays to try again.
+
+APFS FileVault containers are not supported yet: go-filesystems/apfs cannot read
+one through its decrypted device so far, and that is being fixed there first.
 
 ## How it works {#how-it-works}
 
@@ -46,5 +56,14 @@ apfs, btrfs, xfs and zfs open a partition of a disk image by path rather than an
 The image is untrusted input: every answer is bounded (entries per listing, bytes
 per read), a driver panic becomes an error, a request that takes more than 30 s
 restarts the engine, and names from the image are shown as text, never as HTML.
+
+A LUKS header is untrusted too: it says how much key derivation unlocking costs.
+The engine refuses a header that asks for more than 2²² PBKDF2 iterations, or for
+Argon2 beyond 16 passes or 1 GiB, before deriving anything (go-fde/luks
+`OpenFromLimited`). An unlock gets 180 s.
+
+The password goes to the engine in the tab for one open. It is not stored and
+never sent anywhere. The page empties the field, and the engine clears its copy
+once the container is unlocked or refused.
 
 Source: <https://github.com/go-filesystems/playground>
