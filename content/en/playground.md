@@ -35,8 +35,9 @@ it and opens the filesystem in the payload: detected, or the one chosen in the
 list. The facts then read e.g. `ext4 in LUKS`. A wrong password is refused, and
 the form stays to try again.
 
-APFS FileVault containers are not supported yet: go-filesystems/apfs cannot read
-one through its decrypted device so far, and that is being fixed there first.
+The playground does not support APFS FileVault containers yet.
+go-filesystems/apfs reads them since v0.4.0
+(`OpenFDEFromBlockDeviceLimited`), and the playground is still to call it.
 
 ## How it works {#how-it-works}
 
