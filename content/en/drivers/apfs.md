@@ -22,7 +22,13 @@ Implements [`filesystem.Filesystem`]({{< relref "../interface.md" >}}). No cgo, 
 - Real APFS read: FS-tree traversal, multi-extent files, xattrs, sealed volumes
 - Snapshot read (`OpenSnapshot`)
 - Write & format kext-mountable containers
-- FileVault software encryption (`FormatContainerEncrypted`)
+- FileVault software encryption: write (`FormatContainerEncrypted`) and,
+  since v0.4.0, read-only open (`OpenFDE`, `OpenFDEFromBlockDevice`, and the
+  `…Limited` variants that bound key derivation for untrusted images).
+  Only the FS-tree nodes flagged `OMAP_VAL_ENCRYPTED` and the file extents
+  with a `crypto_id` are decrypted; the container metadata is read as the
+  plaintext it is. A wrong passphrase (`ErrWrongPassphrase`) and a refused
+  keybag (`ErrLimit`) are told apart with `errors.Is`.
 - GPT + Apple DMG output
 - POSIX special files
 - Container resize (`Resize`)
@@ -31,6 +37,8 @@ Implements [`filesystem.Filesystem`]({{< relref "../interface.md" >}}). No cgo, 
 
 - Snapshot creation gated behind an Apple-private entitlement
 - Some encrypted-container fsck stages are Apple-private
+- Writing to a FileVault volume (it opens read-only); per-file-key
+  (hardware) encryption
 
 ## Install {#install}
 
