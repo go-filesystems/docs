@@ -46,7 +46,18 @@ frame. It is fetched only then (4.1 MB compressed), and browses the image the wa
 browses a fileshare server, over WebDAV. None of its requests reach a network. The
 page hands each one to the engine, which answers it with
 [go-filesystems/webdav](https://github.com/go-filesystems/webdav) over the open
-image, read-only. Closing the explorer unloads it.
+image. Closing the explorer unloads it.
+
+### Changing the image {#changes}
+
+In the explorer you can upload, make folders, rename, copy and delete, on
+[fat32]({{< relref "drivers/fat32.md" >}}), [exfat]({{< relref "drivers/exfat.md" >}})
+and [ext4]({{< relref "drivers/ext4.md" >}}). The other drivers refuse writes. The
+file you dropped is never written. A change lands in a copy-on-write layer under
+the drivers, in the tab's memory (at most 256 MiB), and inside a LUKS container it
+lands encrypted. **Download the modified image** then saves the original with the
+changes in it, in the same format. Opening another image, or leaving, asks first
+while changes are not downloaded.
 
 ## How it works {#how-it-works}
 
