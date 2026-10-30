@@ -35,9 +35,12 @@ it and opens the filesystem in the payload: detected, or the one chosen in the
 list. The facts then read e.g. `ext4 in LUKS`. A wrong password is refused, and
 the form stays to try again.
 
-The playground does not support APFS FileVault containers yet.
-go-filesystems/apfs reads them since v0.4.0
-(`OpenFDEFromBlockDeviceLimited`), and the playground is still to call it.
+An **APFS FileVault** volume ([apfs]({{< relref "drivers/apfs.md" >}}) v0.4.0,
+`OpenFDEFromBlockDeviceLimited`) is recognised by the keybag its container names,
+at offset 0 or in a GPT's APFS partition. When the volume cannot be read without
+its key, the page asks for the password, and the facts then read `apfs in
+FileVault`. A FileVault volume opens read-only. In both cases the key derivation
+the header or keybag asks for is bounded before any work is done.
 
 ### Open in the explorer {#explorer}
 
