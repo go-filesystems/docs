@@ -24,6 +24,10 @@ Implements [`filesystem.Filesystem`]({{< relref "../interface.md" >}}). No cgo, 
 - Bare images + MBR/GPT
 - Volume label (`Labeller`)
 - Resize (`filesystem.Resizer`)
+- fsck-clean images (v0.5.1): `fsck_msdos -n` and `fsck.vfat -n` exit 0 on what
+  the driver writes. The `..` entry of a directory under the root holds
+  cluster 0, and the FSInfo free count and next-free hint are exact at format
+  and kept current while the image is written
 - Format to a path (`Format`) or into any `io.ReaderAt` + `io.WriterAt`, such as
   a buffer in memory (`FormatImage`) — what the
   [playground]({{< relref "../playground.md" >}}) uses to make its sample image
