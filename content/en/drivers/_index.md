@@ -16,7 +16,7 @@ same sense as the rows in this table).
 | <img src="../assets/fs/go-filesystems-btrfs.png" width="28"> | [`btrfs`]({{< relref "btrfs.md" >}}) | ✅ | ✅ | ✅ | ✅ | ✅ | ✕ | ✕ | — | Single-device, CRC32c (btrfs-progs ≥ 5.x) | Linux |
 | <img src="../assets/fs/go-filesystems-exfat.png" width="28"> | [`exfat`]({{< relref "exfat.md" >}}) | ✅ | ✅ | ✅ | ✅ | ✕ | — | — | — | exFAT | Windows / removable |
 | <img src="../assets/fs/go-filesystems-ext4.png" width="28"> | [`ext4`]({{< relref "ext4.md" >}}) | ✅ | ✅ | ✅ | ✅ | ✅ | ✕ | — | ✕ | ext4 — extents, 64-bit, flex_bg, dir htree, metadata_csum (CRC32c) | Linux |
-| <img src="../assets/fs/go-filesystems-fat32.png" width="28"> | [`fat32`]({{< relref "fat32.md" >}}) | ✅ | ✅ | ✅ | ✅ | ✕ | — | — | — | FAT32 | cross-platform |
+| <img src="../assets/fs/go-filesystems-fat32.png" width="28"> | [`fat32`]({{< relref "fat32.md" >}}) | ✅ | ✅ | ✅ | ✅ | ✕ | — | — | — | FAT32; FAT12 / FAT16 read-only | cross-platform |
 | <img src="../assets/fs/go-filesystems-ffs.png" width="28"> | [`ffs`]({{< relref "ffs.md" >}}) | ✅ | ✅ | ✅ | — | ✅ | ✕ | ✕ | — | NetBSD/OpenBSD FFSv1/FFSv2 — thin re-export of `ufs` | BSD |
 | <img src="../assets/fs/go-filesystems-hfsplus.png" width="28"> | [`hfsplus`]({{< relref "hfsplus.md" >}}) | ✅ | ✅ | ✅ | ✅ | ✅ | — | — | — | HFS+ / HFSX (Mac OS Extended), big-endian catalog + extents-overflow B-trees | macOS (legacy) |
 | <img src="../assets/fs/go-filesystems-iso9660.png" width="28"> | [`iso9660`]({{< relref "iso9660.md" >}}) | ✅ | ✕ | ✕ | — | ✅ | — | — | — | ISO 9660 / ECMA-119 + Rock Ridge (names/perms/symlinks) + Joliet (UCS-2 names) | cross-platform (optical) |
