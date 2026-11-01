@@ -34,6 +34,10 @@ mutate in place · **Format** = create a fresh image. Quota / Snapshots /
 Encryption reflect **driver** support, not just the on-disk format's
 capability.
 
+[`oci`](https://github.com/go-filesystems/oci) bounds every input-driven
+allocation before it happens (`DefaultLimits()`: manifests 16 MiB, 16 GiB for a
+whole image); an excess returns an error wrapping `safeio.ErrTooLarge`.
+
 Also in the org: [`detect`](https://github.com/go-filesystems/detect), a
 `blkid`-style type prober and driver-opener registry that dispatches to the
 drivers above — it isn't an on-disk format itself, so it has no row.

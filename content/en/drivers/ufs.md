@@ -28,6 +28,14 @@ Implements [`filesystem.Filesystem`]({{< relref "../interface.md" >}}). No cgo, 
 
 - Triple-indirect blocks unsupported (`ErrUnsupportedIndirect`)
 
+## Untrusted input {#untrusted-input}
+
+A file is read block by block into a buffer that grows with what was read. Since
+a sparse file legitimately reads back bigger than the image, a read has a
+ceiling: `DefaultMaxFileBytes` (1 GiB), changed with `(*FS).SetMaxFileBytes`. A
+read over it fails with an error wrapping `ufs.ErrTooLarge`, before anything is
+allocated.
+
 ## Install {#install}
 
 ```bash

@@ -33,6 +33,12 @@ A UEFI variable store, not a POSIX filesystem.
 - Time-based authenticated writes not supported
 - `MkDir` / `DeleteDir` / `ReadLink` return "not supported" (a store, not a tree)
 
+## Untrusted input {#untrusted-input}
+
+A store file is bounded before it is read: `OpenLimits` takes `MaxFileSize`
+(default `DefaultMaxFileSize`, 256 MiB) and `MaxVariables` (default 65 536), and
+an excess returns an error wrapping `safeio.ErrTooLarge`.
+
 ## Install {#install}
 
 ```bash

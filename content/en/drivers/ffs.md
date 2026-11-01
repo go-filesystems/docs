@@ -24,6 +24,13 @@ Everything the `ufs` driver provides, under an import path that matches how
 NetBSD/OpenBSD callers think of the format (`ffs.OpenFile`, `ffs.Open`,
 `ffs.OpenRW` — thin aliases of the `ufs` entry points).
 
+## Untrusted input {#untrusted-input}
+
+`ffs` re-exports `ufs`, so it inherits its bounds on an untrusted image: a read
+grows its buffer with the blocks it reads, and a sparse file is limited to
+`DefaultMaxFileBytes` (1 GiB), changed with `SetMaxFileBytes`; a read over it
+fails with an error wrapping `ufs.ErrTooLarge`.
+
 ## Install {#install}
 
 ```bash

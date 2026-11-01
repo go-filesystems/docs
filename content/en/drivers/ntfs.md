@@ -36,6 +36,13 @@ Lightweight, test-oriented. Use a real NTFS implementation for on-disk compatibi
 - The real on-disk reader is read-only and does not decode EFS-encrypted data
 - `Grow`/`Shrink`/`Resize`/`Compact` operate on the NTFSIMG1 image only, not real on-disk NTFS
 
+## Untrusted input {#untrusted-input}
+
+Every allocation a value in the image can size is bounded before it happens: a
+data run must lie inside the image, and a read is capped at `DefaultMaxDataSize`,
+changed with `SetMaxDataSize`. A hostile image gets an error, not an
+out-of-memory kill.
+
 ## Install {#install}
 
 ```bash
