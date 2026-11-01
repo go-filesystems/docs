@@ -8,7 +8,8 @@ weight: 80
 <img src="../../assets/fs/go-filesystems-fat32.png" width="110" align="right">
 
 FAT with 32-bit allocation. Since v0.6.0 it also **reads FAT12 and FAT16**
-volumes: what `newfs_msdos -F 12|16` and `mkfs.vfat` produce below about 33 MiB.
+volumes, and since v0.7.0 **writes** them: what `newfs_msdos -F 12|16` and
+`mkfs.vfat` produce below about 33 MiB.
 
 Implements [`filesystem.Filesystem`]({{< relref "../interface.md" >}}). No cgo, no root.
 
@@ -16,7 +17,7 @@ Implements [`filesystem.Filesystem`]({{< relref "../interface.md" >}}). No cgo, 
 
 | Read | Write | Format | Label | Symlinks | On-disk format |
 |:--:|:--:|:--:|:--:|:--:|---|
-| ✅ | ✅ | ✅ | ✅ | ✕ | FAT32 (read/write); FAT12, FAT16 (read-only) |
+| ✅ | ✅ | ✅ | ✅ | ✕ | FAT32, FAT12, FAT16 (read/write; no resize on FAT12/16) |
 
 ## FAT12 and FAT16 {#fat12-16}
 
@@ -26,10 +27,14 @@ specification says (below 4085 is FAT12, below 65525 FAT16), never by the
 the FATs, and a FAT12 entry is 12 bits packed, so one can straddle a sector
 boundary. Both are handled; `Info.Type` says which one a volume is.
 
-**They are read-only in v0.6.0**: every write returns `ErrReadOnlyFAT` and
-leaves the image untouched. Together with
-[`detect`](https://github.com/go-filesystems/detect) v0.4.0, which now reports `fat12` and
-`fat16`, such an image opens exactly like a FAT32 one.
+**Writing works** (v0.7.0): files, directories, rename, truncate, the label and
+positional writes. The fixed root directory never grows, so a create in a full
+root fails with `directory is full` and changes nothing; long-name entries count
+against its capacity. `Resize`, `Grow` and `Shrink` are not supported on
+FAT12/16 and return `ErrResizeFAT`. After every mutation scenario the image
+passes `fsck_msdos -n`. Together with
+[`detect`](https://github.com/go-filesystems/detect) v0.4.0, which reports
+`fat12` and `fat16`, such an image opens exactly like a FAT32 one.
 
 ## Supported {#supported}
 
@@ -50,7 +55,7 @@ leaves the image untouched. Together with
 ## Not implemented {#not-implemented}
 
 - No POSIX symlinks (not in FAT32)
-- Writing to a FAT12 or FAT16 volume (read-only for now)
+- Resizing a FAT12 or FAT16 volume
 
 ## Untrusted input {#untrusted-input}
 
