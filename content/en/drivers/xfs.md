@@ -29,6 +29,13 @@ Implements [`filesystem.Filesystem`]({{< relref "../interface.md" >}}). No cgo, 
 - Extended metadata: `ExtendedStat`, `Chown`, `Chmod`, `Chtimes`, `Truncate`, `Link` (hardlinks)
 - Layered backends via `OpenFromDevice` (LUKS / qcow2 / in-memory)
 
+## Untrusted input {#untrusted-input}
+
+Every allocation and walk sized from a value on the image is checked against
+what the image can hold before it happens. `ReadFile` and remote symlinks are
+capped at `DefaultMaxReadSize` (1 GiB, changed with `SetMaxReadSize`) and refused
+with `ErrTooLarge`; bmbt extent records that overlap are refused.
+
 ## Install {#install}
 
 ```bash

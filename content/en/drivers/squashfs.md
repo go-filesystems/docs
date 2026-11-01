@@ -34,6 +34,13 @@ Implements [`filesystem.Filesystem`]({{< relref "../interface.md" >}}). No cgo, 
 - Legacy standalone `lzma` compression (`ErrUnsupportedCompression`); xz with BCJ filters
 - Extended attributes (xattr table)
 
+## Untrusted input {#untrusted-input}
+
+Every input-driven allocation is bounded before it is made: `block_size` is at
+most 1 MiB, a directory at most 4 Mi entries, and `ReadFile` refuses more than
+`DefaultMaxReadFile` (1 GiB) with `ErrTooLarge`; `ReadFileLimit(path, max)`
+picks another ceiling, and `OpenFile` + `ReadAt` stream any size.
+
 ## Install {#install}
 
 ```bash

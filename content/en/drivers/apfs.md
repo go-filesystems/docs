@@ -40,6 +40,14 @@ Implements [`filesystem.Filesystem`]({{< relref "../interface.md" >}}). No cgo, 
 - Writing to a FileVault volume (it opens read-only); per-file-key
   (hardware) encryption
 
+## Untrusted input {#untrusted-input}
+
+Every size in an image is a claim, bounded before it is made: file reads by the
+backing store's real size, each extent must lie inside the image, sparse holes
+and a declared size past the last extent by 1 GiB of invented zeros
+(`safeio.ErrTooLarge`; stream larger sparse files with `FileReaderAt`), and a
+decmpfs `uncompressedSize` by 1 GiB.
+
 ## Install {#install}
 
 ```bash
