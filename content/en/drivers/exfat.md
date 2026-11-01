@@ -27,6 +27,13 @@ Implements [`filesystem.Filesystem`]({{< relref "../interface.md" >}}). No cgo, 
 
 - No POSIX symlinks, permissions or ACLs (not in exFAT)
 
+## Untrusted input {#untrusted-input}
+
+Every allocation a value in the image can size is bounded before it happens: a
+cluster buffer is allocated only after the cluster's last byte has been read, and
+a directory is at most 256 MiB. A hostile image gets an error, not an
+out-of-memory kill.
+
 ## Install {#install}
 
 ```bash
