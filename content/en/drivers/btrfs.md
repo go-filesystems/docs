@@ -27,6 +27,14 @@ Implements [`filesystem.Filesystem`]({{< relref "../interface.md" >}}). No cgo, 
 
 - Snapshots, send/receive, multi-device/RAID, quotas and reflink are not implemented
 
+## Untrusted input {#untrusted-input}
+
+Every allocation, walk and recursion sized from a value on the image is checked
+against what the format can produce before it happens: a compressed extent is at
+most 128 KiB (the kernel's `BTRFS_MAX_UNCOMPRESSED`), a zstd window 128 KiB,
+overlapping file extent items are refused, and a chunk `stripe_len` must be
+exactly 64 KiB.
+
 ## Install {#install}
 
 ```bash

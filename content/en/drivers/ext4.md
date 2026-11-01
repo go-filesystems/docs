@@ -32,6 +32,15 @@ Implements [`filesystem.Filesystem`]({{< relref "../interface.md" >}}). No cgo, 
 - Some cross-check tests require `mke2fs`
 - Not every kernel ioctl / obscure feature is implemented
 
+## Untrusted input {#untrusted-input}
+
+Every allocation and walk sized from a value on the image is checked against
+what the image can hold before it happens. `ReadFile` is capped at the smaller of
+the declared filesystem size and `DefaultMaxReadSize` (1 GiB), changed with
+`SetMaxReadSize` and refused with `ErrTooLarge`; larger files are read with
+`OpenFile`. Overlapping extent leaves are refused and the extent tree depth is
+at most 5.
+
 ## Install {#install}
 
 ```bash

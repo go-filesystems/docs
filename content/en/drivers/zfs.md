@@ -38,6 +38,14 @@ Implements [`filesystem.Filesystem`]({{< relref "../interface.md" >}}). No cgo, 
 - Snapshots/clones are eager block copies, not O(1) copy-on-write; no ACLs
 - A missing RAID-Z data leg is not yet reconstructed from parity
 
+## Untrusted input {#untrusted-input}
+
+Every allocation and walk sized from a value on the image is checked against
+what the image can hold before it happens, with bounds taken from the OpenZFS
+sources: block pointer sizes are at most `SPA_MAXBLOCKSIZE` (16 MiB), and
+`ReadFile` / `ReadLink` are capped at `DefaultMaxReadSize` (1 GiB, changed with
+`SetMaxReadSize`) and refused with `ErrTooLarge` before any buffer is sized.
+
 ## Install {#install}
 
 ```bash
