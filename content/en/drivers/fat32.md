@@ -35,13 +35,20 @@ against its capacity. After every mutation scenario the image passes
 
 **Resizing works** (v0.8.0) while the volume keeps its FAT type. `Shrink` refuses
 when a cluster past the new end is in use and leaves the FAT at its size; `Grow`
-works while the existing FAT has room for the new clusters (so shrink then grow
-back always fits), because the FATs sit before the fixed root and the data. Sizes
-are whole sectors. A resize that would change the type (crossing 4085 or 65525
-clusters) is refused with `ErrResizeType`: "growing to N clusters would make this
-FAT16 volume FAT32; copy it into a new image of that size with CopyResized". A grow that needs a bigger FAT is refused
-with `ErrResizeFATFull`. Both wrap `ErrResizeFAT`, and a refused resize changes
-nothing. Together with
+works in place, **even when the FAT itself must grow** (v0.10.0): the FAT is made
+bigger and the fixed root and the data shift forward by the difference, from the
+end backwards in 64 KiB chunks. Cluster numbers do not change, so no FAT entry,
+directory entry or chain is rewritten. Sizes are whole sectors. A resize that
+would change the type (crossing 4085 or 65525 clusters) is refused with
+`ErrResizeType`: "growing to N clusters would make this FAT16 volume FAT32; copy
+it into a new image of that size with CopyResized". A grow too small to keep the
+clusters the volume has once its FAT has grown is refused too. Both wrap
+`ErrResizeFAT`, and a refused resize changes nothing (`ErrResizeFATFull` is no
+longer returned). **Crash window**: a grow that does not move the layout, and a
+shrink, leave the old or the new size at any interruption. A grow that moves it
+is invisible to the old volume until its first move; from then until its last
+write, the boot sector, the volume is not consistent. Copy first, or use
+`CopyResized`, if that matters. Together with
 [`detect`](https://github.com/go-filesystems/detect) v0.4.0, which reports
 `fat12` and `fat16`, such an image opens exactly like a FAT32 one.
 
@@ -52,14 +59,14 @@ nothing. Together with
 - Bare images + MBR/GPT
 - Volume label (`Labeller`)
 - Resize (`filesystem.Resizer`)
-- `CopyResized` (v0.9.0): the resize FAT12/16 cannot do in place. It formats a
+- `CopyResized` (v0.9.0): the resize FAT12/16 cannot do in place (another FAT
+  type), or with no crash window. It formats a
   new image of the wanted size (the FAT type follows from the cluster count as
   `mkfs.fat` decides, or is forced; impossible combinations are refused) and
   copies the whole tree: long names, directories, contents, attributes,
   timestamps and the label. The source is only read. A tree that does not fit,
   or a root with more entries than a FAT12/16 fixed root, is refused before the
-  destination is written. Growing the FAT in place would shift the root and the
-  data, and an interrupted shift leaves an image no layout describes
+  destination is written
 - fsck-clean images (v0.5.1): `fsck_msdos -n` and `fsck.vfat -n` exit 0 on what
   the driver writes. The `..` entry of a directory under the root holds
   cluster 0, and the FSInfo free count and next-free hint are exact at format
@@ -72,9 +79,9 @@ nothing. Together with
 ## Not implemented {#not-implemented}
 
 - No POSIX symlinks (not in FAT32)
-- Resizing a FAT12 or FAT16 volume to another FAT type, or to a size whose FAT
-  would have to grow (the root and the data would move): done by `CopyResized`
+- Resizing a FAT12 or FAT16 volume to another FAT type: done by `CopyResized`
   instead, never in place
+- A crash-proof in-place grow that moves the layout (needs a journal)
 
 ## Untrusted input {#untrusted-input}
 
