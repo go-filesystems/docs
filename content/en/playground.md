@@ -63,6 +63,24 @@ lands encrypted. **Download the modified image** then saves the original with th
 changes in it, in the same format. Opening another image, or leaving, asks first
 while changes are not downloaded.
 
+### Copy to a resized image {#resize}
+
+A volume in the tab cannot be truncated, so a FAT image cannot grow in place, and a
+FAT12/16 root directory cannot grow either. On a FAT image (not one inside LUKS), the
+**Resize** row asks for a new size (1 to 256 MiB, the bound that applies to changes),
+a FAT type (FAT12, FAT16, FAT32, or *let the size decide*, as `mkfs.fat` does) and
+an optional label. [fat32]({{< relref "drivers/fat32.md" >}})'s `CopyResized`
+(v0.9.0) then formats a new image of that size in memory and copies the whole tree
+into it, your changes included. The page shows the type and size it made, and you
+can **download the copy** or **open the copy** in place of the image. The open image
+is only read.
+
+A request that cannot be met is refused with the reason, and nothing is made: the
+tree does not fit (`ErrCopyNoFit`), the root directory needs more entries than a
+FAT12/16 fixed root holds (`ErrCopyRootFull`), the size cannot be formatted as the
+chosen type (FAT32 needs at least 65525 clusters), or the size is outside the bound.
+The size is checked before any memory is taken.
+
 ## How it works {#how-it-works}
 
 - The Go engine runs in a **Web Worker**. Its `io.ReaderAt` reads the dropped
