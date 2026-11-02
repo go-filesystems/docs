@@ -17,7 +17,7 @@ Implements [`filesystem.Filesystem`]({{< relref "../interface.md" >}}). No cgo, 
 
 | Read | Write | Format | Label | Symlinks | On-disk format |
 |:--:|:--:|:--:|:--:|:--:|---|
-| ✅ | ✅ | ✅ | ✅ | ✕ | FAT32, FAT12, FAT16 (read/write; no resize on FAT12/16) |
+| ✅ | ✅ | ✅ | ✅ | ✕ | FAT32, FAT12, FAT16 (read/write/resize; FAT12/16 resize keeps the type) |
 
 ## FAT12 and FAT16 {#fat12-16}
 
@@ -30,9 +30,18 @@ boundary. Both are handled; `Info.Type` says which one a volume is.
 **Writing works** (v0.7.0): files, directories, rename, truncate, the label and
 positional writes. The fixed root directory never grows, so a create in a full
 root fails with `directory is full` and changes nothing; long-name entries count
-against its capacity. `Resize`, `Grow` and `Shrink` are not supported on
-FAT12/16 and return `ErrResizeFAT`. After every mutation scenario the image
-passes `fsck_msdos -n`. Together with
+against its capacity. After every mutation scenario the image passes
+`fsck_msdos -n`.
+
+**Resizing works** (v0.8.0) while the volume keeps its FAT type. `Shrink` refuses
+when a cluster past the new end is in use and leaves the FAT at its size; `Grow`
+works while the existing FAT has room for the new clusters (so shrink then grow
+back always fits), because the FATs sit before the fixed root and the data. Sizes
+are whole sectors. A resize that would change the type (crossing 4085 or 65525
+clusters) is refused with `ErrResizeType`: "growing to N clusters would make this
+FAT16 volume FAT32; reformat instead". A grow that needs a bigger FAT is refused
+with `ErrResizeFATFull`. Both wrap `ErrResizeFAT`, and a refused resize changes
+nothing. Together with
 [`detect`](https://github.com/go-filesystems/detect) v0.4.0, which reports
 `fat12` and `fat16`, such an image opens exactly like a FAT32 one.
 
@@ -55,7 +64,8 @@ passes `fsck_msdos -n`. Together with
 ## Not implemented {#not-implemented}
 
 - No POSIX symlinks (not in FAT32)
-- Resizing a FAT12 or FAT16 volume
+- Resizing a FAT12 or FAT16 volume to another FAT type, or to a size whose FAT
+  would have to grow (the root and the data would move): reformat instead
 
 ## Untrusted input {#untrusted-input}
 
