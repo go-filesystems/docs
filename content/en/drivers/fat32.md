@@ -44,11 +44,20 @@ would change the type (crossing 4085 or 65525 clusters) is refused with
 it into a new image of that size with CopyResized". A grow too small to keep the
 clusters the volume has once its FAT has grown is refused too. Both wrap
 `ErrResizeFAT`, and a refused resize changes nothing (`ErrResizeFATFull` is no
-longer returned). **Crash window**: a grow that does not move the layout, and a
-shrink, leave the old or the new size at any interruption. A grow that moves it
-is invisible to the old volume until its first move; from then until its last
-write, the boot sector, the volume is not consistent. Copy first, or use
-`CopyResized`, if that matters. Together with
+longer returned). **Crash safety** (v0.11.0): a grow that does not move the
+layout, and a shrink, leave the old or the new size at any interruption. A grow
+that moves the layout (FAT12, FAT16 and FAT32) is journaled and rolled forward:
+it keeps a record in the last sector of the image, and the next `Open` (or
+`OpenReader` over a writer) finishes an interrupted grow before serving the
+volume. Every interruption therefore ends as the old volume (the record was
+never written) or the grown one, `fsck_msdos`-clean with every file intact. Until
+that `Open`, a tool that does not know the record sees a half-moved layout
+between the first move and the boot-sector write; over a read-only reader an
+interrupted volume is refused (`ErrReadOnlyReader`). A grow too small to leave
+the record a free sector past the moved layout is refused (`ErrGrowTooSmall`).
+Chunks of 256 KiB or more are flushed (`Sync`) around their record; below that
+the order holds for a process crash or an I/O error, not a power loss
+mid-move. Together with
 [`detect`](https://github.com/go-filesystems/detect) v0.4.0, which reports
 `fat12` and `fat16`, such an image opens exactly like a FAT32 one.
 
@@ -60,7 +69,7 @@ write, the boot sector, the volume is not consistent. Copy first, or use
 - Volume label (`Labeller`)
 - Resize (`filesystem.Resizer`)
 - `CopyResized` (v0.9.0): the resize FAT12/16 cannot do in place (another FAT
-  type), or with no crash window. It formats a
+  type), or one that leaves the source untouched. It formats a
   new image of the wanted size (the FAT type follows from the cluster count as
   `mkfs.fat` decides, or is forced; impossible combinations are refused) and
   copies the whole tree: long names, directories, contents, attributes,
