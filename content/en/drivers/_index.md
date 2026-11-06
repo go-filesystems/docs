@@ -34,6 +34,17 @@ mutate in place · **Format** = create a fresh image. Quota / Snapshots /
 Encryption reflect **driver** support, not just the on-disk format's
 capability.
 
+**Reading a range of a large file.** A server that answers a read of a few bytes
+(NFS `READ`, SFTP) should not load the whole file. Since the audit of
+2026-11-05, `apfs` v0.6.0, `btrfs` v0.5.0, `hfsplus` v0.6.0, `ntfs` v0.4.0,
+`ufs` v0.5.0, `xfs` v0.5.0 and `zfs` v0.5.0 implement `filesystem.Opener`
+(`OpenFile(path)` returns a file whose `ReadAt` reads only the extents or blocks of
+its window; holes read as zeros). A 1 MiB read at 66 MiB of a 72 MiB file allocates 0 bytes
+through it on `hfsplus`, `apfs`, `btrfs`, `xfs` and `ntfs`, 5.5 MB on `ufs` and
+1.1 MB on `zfs`, against 75 to 538 MB through `ReadFile`. A compressed (LZNT1)
+stream of a real NTFS volume is still decoded whole, once, on the first read.
+go-filesystems/nfs bounds the whole-file fallback at 64 MiB (`NFS3ERR_IO` above).
+
 [`oci`](https://github.com/go-filesystems/oci) bounds every input-driven
 allocation before it happens (`DefaultLimits()`: manifests 16 MiB, 16 GiB for a
 whole image); an excess returns an error wrapping `safeio.ErrTooLarge`.
