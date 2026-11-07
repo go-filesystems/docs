@@ -67,6 +67,10 @@ mid-move. Together with
 - Directories, recursive delete, rename
 - Bare images + MBR/GPT
 - Volume label (`Labeller`)
+- Times (`filesystem.TimesReader`, v0.12.0): write time to 2 s, access time as a
+  date (24 h), creation time to 10 ms; no change time. FAT stores the local wall
+  clock, read here in `time.Local`. A zero or invalid field is "not recorded".
+  Checked against entries written by `newfs_msdos` and mtools `mcopy -m`
 - Resize (`filesystem.Resizer`)
 - `CopyResized` (v0.9.0): the resize FAT12/16 cannot do in place (another FAT
   type), or one that leaves the source untouched. It formats a
