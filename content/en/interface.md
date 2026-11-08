@@ -63,8 +63,10 @@ Each time is a `Timestamp`, not a `time.Time`:
 
 Implemented by [`osfs`](https://github.com/go-filesystems/osfs) v0.4.0 and
 [`fat32`]({{< relref "drivers/fat32.md" >}}) v0.12.0,
-[`exfat`]({{< relref "drivers/exfat.md" >}}) v0.5.0 and the real-NTFS reader of
-[`ntfs`]({{< relref "drivers/ntfs.md" >}}) v0.5.0; the SMB, NFS, SFTP and
+[`exfat`]({{< relref "drivers/exfat.md" >}}) v0.5.0, the real-NTFS reader of
+[`ntfs`]({{< relref "drivers/ntfs.md" >}}) v0.5.0,
+[`ext4`]({{< relref "drivers/ext4.md" >}}) v0.5.0 and
+[`hfsplus`]({{< relref "drivers/hfsplus.md" >}}) v0.7.0; the SMB, NFS, SFTP and
 WebDAV servers report them to clients when the driver has them.
 
 See the [package reference](https://pkg.go.dev/github.com/go-filesystems/interface) for the
