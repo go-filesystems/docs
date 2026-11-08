@@ -29,6 +29,10 @@ Lightweight, test-oriented. Use a real NTFS implementation for on-disk compatibi
 - In-image Grow / Shrink / Resize and compaction (`Compact`, `FragmentationStats`, `Layout`)
 - A separate read-only reader parses genuine on-disk NTFS: LZNT1 decompression, named
   streams (ADS), `$REPARSE_POINT` symlinks/junctions, `$ATTRIBUTE_LIST`, volume label
+- Times on that real-NTFS reader (`filesystem.TimesReader`, v0.5.0): creation,
+  modification, MFT change and access, each a 100 ns UTC FILETIME from
+  `$STANDARD_INFORMATION` (`$FILE_NAME` only as a fallback); a FILETIME of 0 is "not
+  recorded". Not on the NTFSIMG1 in-image driver
 
 ## Not implemented {#not-implemented}
 
