@@ -22,6 +22,10 @@ Implements [`filesystem.Filesystem`]({{< relref "../interface.md" >}}). No cgo, 
 - Read/write files
 - Directories, recursive delete, rename
 - Bare images + MBR/GPT
+- Times (`filesystem.TimesReader`, v0.5.0): creation and modification to 10 ms, access
+  to 2 s, each with its UTC-offset byte (a clear OffsetValid bit reads as `time.Local`,
+  as the spec says); no change time. An invalid date is "not recorded". Checked against
+  an image written by macOS `newfs_exfat`
 
 ## Not implemented {#not-implemented}
 

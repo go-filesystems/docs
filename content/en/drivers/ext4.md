@@ -26,6 +26,11 @@ Implements [`filesystem.Filesystem`]({{< relref "../interface.md" >}}). No cgo, 
 - `CheckImage` / `RepairImage` hooks
 - `GetFlags`/`SetFlags` ioctls
 - MBR/GPT auto-detect
+- Times (`filesystem.TimesReader`, v0.5.0): access, modification and change to 1 ns
+  when the inode's `_extra` words fit (their two epoch bits extend the seconds), 1 s
+  otherwise; creation from `i_crtime` only when the inode is large enough, so 128-byte
+  ext2/ext3 inodes have none. All-zero is "not recorded". Checked against images made
+  by `mke2fs` and `debugfs set_inode_field`
 
 ## Not implemented {#not-implemented}
 

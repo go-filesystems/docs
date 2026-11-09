@@ -23,6 +23,10 @@ Implements [`filesystem.Filesystem`]({{< relref "../interface.md" >}}). No cgo, 
 - Directories, rename
 - `SetLabel` / `Symlink` / `Truncate` (optional `Labeller` / `Symlinker` / `Truncater` capabilities)
 - MBR/GPT auto-detect
+- Times (`filesystem.TimesReader`, v0.7.0): creation, content modification, attribute
+  modification (Mac OS X's change time) and access from the catalog record, to 1 s,
+  GMT seconds since 1904-01-01 (Apple TN1150). A date of 0 is "not recorded", and so is
+  the root folder's. Checked against an image written by macOS `newfs_hfs`
 
 ## Untrusted input {#untrusted-input}
 
