@@ -69,5 +69,24 @@ Implemented by [`osfs`](https://github.com/go-filesystems/osfs) v0.4.0 and
 [`hfsplus`]({{< relref "drivers/hfsplus.md" >}}) v0.7.0; the SMB, NFS, SFTP and
 WebDAV servers report them to clients when the driver has them.
 
+### Setting times over SMB {#smb-set-times}
+
+[`smb`](https://github.com/go-filesystems/smb) v0.10.0 also writes them. A
+SET_INFO `FileBasicInformation` request applies the access and write times the
+client sets, through `MetadataSetter.Chtimes`. A time of 0 keeps that time
+unchanged; -1 freezes it and -2 resumes it, per handle (MS-FSCC 2.4.7, MS-FSA).
+Freezing needs a driver that also implements `TimesReader`: -1 on a `Chtimes`
+driver without it answers `STATUS_NOT_SUPPORTED` in every mode below.
+
+A time that cannot be stored (the creation time, a change time sent alone, or an
+access or write time on a driver without `Chtimes`) follows the per-share option
+`smb.UnstorableTimes(TimePolicy)`:
+
+| Mode | Effect |
+|------|--------|
+| `TimesIgnore` (zero value, default) | Success; the field is dropped, as Samba does, so Explorer and `robocopy /COPY:T` copies work. |
+| `TimesRefuse` | `STATUS_NOT_SUPPORTED`; nothing is applied. |
+| `TimesLog` | As `TimesIgnore`, plus a `slog` line on `Server.Logger` (default `slog.Default()`), with the path escaped. |
+
 See the [package reference](https://pkg.go.dev/github.com/go-filesystems/interface) for the
 full API, including `DirEntry` and `Stat`.
