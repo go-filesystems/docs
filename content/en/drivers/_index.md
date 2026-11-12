@@ -52,3 +52,7 @@ whole image); an excess returns an error wrapping `safeio.ErrTooLarge`.
 Also in the org: [`detect`](https://github.com/go-filesystems/detect), a
 `blkid`-style type prober and driver-opener registry that dispatches to the
 drivers above — it isn't an on-disk format itself, so it has no row.
+
+And [`cfb`]({{< relref "../cfb.md" >}}), a read-only reader for Microsoft Compound
+File Binary containers (`.doc`, `.xls`, `.msi`, Prim'X `.zed`): a file system inside
+a file, but not a `Filesystem` driver, so it has no row either.
