@@ -53,6 +53,36 @@ that mounted it knows about the other's changes. Write an image nothing else
 has open.
 {{< /callout >}}
 
+## Durability levels {#durability}
+
+Since v0.12.0 a writable volume chooses, per volume, when a mutation is on the
+medium: `SetDurability(DurabilityStrict | DurabilityMounted | DurabilityLazy)`
+and `Durability()`. `Batch(fn)` runs a group of mutations at `DurabilityLazy` and
+makes them durable with one `Sync`, so the group pays one set of barriers (it is
+not a transaction). The default, `DurabilityStrict`, is unchanged from v0.11.0.
+A barrier is `File.Sync` (`F_FULLFSYNC` on macOS); the counts per commit are:
+
+| Level | First commit | Next, no data | With data | `Sync` | Durable when the mutator returns | Volume between commits |
+|---|:--:|:--:|:--:|:--:|:--:|---|
+| `DurabilityStrict` (default) | 3 | 3 | 3 | 1 | yes | marked clean |
+| `DurabilityMounted` | 2 | 1 | 2 | 1 | yes | marked dirty until `Sync` or `Close` |
+| `DurabilityLazy` | 1 | 0 | 0 | 2 | no, only after `Sync` or `Close` | marked dirty until `Sync` or `Close` |
+
+- **`DurabilityMounted`** behaves like a mounted HFS+ volume (Apple TN1150) and
+  is data-ordered, like ext4 `data=ordered`: a commit that wrote file data puts a
+  barrier between the data and the metadata that points at it. A crash between
+  syncs leaves the volume marked dirty, so the next mount runs `fsck_hfs`, and a
+  journaled volume stays unjournaled until `diskutil enableJournal`.
+- **`DurabilityLazy`** is data-writeback: nothing orders file data before its
+  metadata, so after a crash a file may hold stale bytes of a deleted one, and
+  the mutations since the last `Sync` are lost. **Do not use it where different
+  users share a volume**, or for a volume other clients mount at the same time.
+- `SetDurability` and `Batch` must not run concurrently with a mutator, `Sync` or
+  `Close`. Leaving a level that holds the volume dirty settles it first.
+
+[fileshare](https://github.com/go-fileshare/fileshare) exposes the level as the
+per-share option `hfsplus_durability`.
+
 ## Untrusted input {#untrusted-input}
 
 Every size in an image is a claim. A fork's logical size is bounded by the image
