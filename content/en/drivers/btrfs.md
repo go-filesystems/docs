@@ -22,6 +22,7 @@ Implements [`filesystem.Filesystem`]({{< relref "../interface.md" >}}). No cgo, 
 - Read/write files
 - Directories, rename, symlinks
 - MBR/GPT auto-detect
+- Compressed extents: kernel-format zstd extents (v0.5.4/v0.5.5) and LZO through the shared `go-compressions/lzo` decoder
 
 ## Not implemented {#not-implemented}
 

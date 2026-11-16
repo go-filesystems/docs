@@ -25,7 +25,7 @@ Implements [`filesystem.Filesystem`]({{< relref "../interface.md" >}}). No cgo, 
 - Multi-header directory listings
 - File data: block list (compressed / uncompressed / sparse) + tail-end fragments
 - Path resolution following intermediate and final symlinks
-- Compression: `gzip` (zlib), `xz` (LZMA2), `zstd`, `lzo` (LZO1X), `lz4`, and uncompressed blocks
+- Compression: `gzip` (zlib), `xz` (LZMA2), `zstd`, `lzo` (LZO1X), `lz4` (lzo and lz4 decode through the shared `go-compressions` decoders, v0.7.0), and uncompressed blocks
 - **Image creation** — `BuildFromDir` writes a SquashFS 4.0 image from a tree (gzip or uncompressed), readable by `unsquashfs`
 
 ## Not implemented {#not-implemented}
