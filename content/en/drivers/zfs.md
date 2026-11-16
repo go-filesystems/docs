@@ -25,7 +25,8 @@ Implements [`filesystem.Filesystem`]({{< relref "../interface.md" >}}). No cgo, 
 - Pool info (`Info`)
 - Grow / Shrink / Resize, including `ShrinkWithMode` (Rebuild / InPlace / Auto)
 - Snapshots (`Snapshot`, `OpenSnapshot`, `DestroySnapshot`) and clones (`Clone`, `Origin`)
-- Transparent decompress on read (lz4 / gzip / zstd / lzjb / zle)
+- Transparent decompress on read (lz4 / gzip / zstd / lzjb / zle); lz4 uses the shared `go-compressions/lz4` `DecodeBlock`
+- Block checksums verified on read (v0.6.0)
 - Native encryption read (`OpenFromDeviceDatasetWithKey`, AES-CCM/GCM)
 - Symlinks and hardlinks; chmod/chown/chtimes (type-assert the optional interfaces)
 - Multi-vdev (mirror / RAID-Z) pools opened read via `OpenFromDevices`
