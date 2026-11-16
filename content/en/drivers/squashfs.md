@@ -41,6 +41,24 @@ most 1 MiB, a directory at most 4 Mi entries, and `ReadFile` refuses more than
 `DefaultMaxReadFile` (1 GiB) with `ErrTooLarge`; `ReadFileLimit(path, max)`
 picks another ceiling, and `OpenFile` + `ReadAt` stream any size.
 
+## Parallel reads {#parallel-reads}
+
+Since v0.8.0 the data blocks of a sequential read are decompressed in parallel
+(`inflight.Ordered`: bounded, file order kept; `SetReadParallelism(n)`, default
+`min(GOMAXPROCS, 8)`, 1 = serial). Sequential read of a 256 MiB text-like file
+against the Linux kernel (7.0, 4 vCPU VM), MiB/s:
+
+| compressor | kernel 1 CPU | ours 1 CPU | kernel 4 CPUs | ours 4 CPUs |
+|---|---:|---:|---:|---:|
+| xz | 48.3 | 39.5 | 47.7 | 146.0 |
+| gzip | 283.6 | 231.1 | 261.2 | 718.8 |
+| zstd | 492.1 | 457.4 | 514.6 | 1527.1 |
+| lz4 | 1232.3 | 1909.3 | 977.4 | 3136.5 |
+| lzo | 685.5 | 623.3 | 588.0 | 1649.3 |
+
+Single-core xz, gzip, zstd and lzo are still behind the kernel. Random 4 KiB
+reads are unchanged (and about 10x slower than the kernel's page cache path).
+
 ## Install {#install}
 
 ```bash
