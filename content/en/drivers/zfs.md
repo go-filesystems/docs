@@ -26,7 +26,7 @@ Implements [`filesystem.Filesystem`]({{< relref "../interface.md" >}}). No cgo, 
 - Grow / Shrink / Resize, including `ShrinkWithMode` (Rebuild / InPlace / Auto)
 - Snapshots (`Snapshot`, `OpenSnapshot`, `DestroySnapshot`) and clones (`Clone`, `Origin`)
 - Transparent decompress on read (lz4 / gzip / zstd / lzjb / zle); lz4 uses the shared `go-compressions/lz4` `DecodeBlock`
-- Block checksums verified on read (v0.6.0)
+- Block checksums verified on read: fletcher2/4, SHA-256, SHA-512/256 (v0.6.0), and BLAKE3, Skein and Edon-R keyed with the pool checksum salt, plain and encrypted (v0.7.0, checked against pools written by the OpenZFS 2.3.4 kernel)
 - Native encryption read (`OpenFromDeviceDatasetWithKey`, AES-CCM/GCM)
 - Symlinks and hardlinks; chmod/chown/chtimes (type-assert the optional interfaces)
 - Multi-vdev (mirror / RAID-Z) pools opened read via `OpenFromDevices`
