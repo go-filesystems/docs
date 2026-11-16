@@ -11,6 +11,9 @@ Pure-Go filesystem drivers — read & write disk images, no cgo, no root.
 filesystem images — one module per filesystem, all implementing the shared
 [`filesystem.Filesystem`]({{< relref "interface.md" >}}) contract. No cgo, no root.
 
+The [SMB server]({{< relref "smb.md" >}}) (v0.15.0) exports any of them to the
+file manager of Windows, macOS or Linux, with SMB 3.1.1, encryption and signing.
+
 **Try it in your browser:** the [playground]({{< relref "playground.md" >}}) opens a
 disk image locally, in WebAssembly — nothing is uploaded.
 
