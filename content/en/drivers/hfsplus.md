@@ -37,7 +37,8 @@ over whatever was written around it, so:
 - A **journaled volume with an empty journal** (start == end, what a clean
   unmount leaves) is written directly. The journal info block, the journal and
   the journaled attribute are left as they were, so macOS replays nothing at
-  the next mount. Since v0.12.3 the first write stamps `lastMountedVersion` =
+  the next mount. Since v0.12.3 the first commit that changes anything, on
+  every volume, journaled or not, stamps `lastMountedVersion` =
   `'GoHF'` into both volume headers (TN1150: an implementation that modifies
   the volume sets this field). It is not `'HFSJ'`, because this driver does not
   maintain the journal; writing through the journal
@@ -53,8 +54,9 @@ over whatever was written around it, so:
   or start or end is 0, beyond the journal size, beyond 1 GiB, or not a
   multiple of 512. Two bounds guards protect our reader: `jhdr_size` at least
   the 44-byte header and at most the journal size. Three older checks stay
-  stricter than Apple's (the `JHDR` magic, the endian field, the header size
-  against the Journal Info Block) and can turn a journal macOS opens into
+  stricter than Apple's: the magic (we accept only `JNLx`, Apple also accepts
+  `JHDR`, which we refuse), the endian field, and the journal size recorded in
+  the journal header against the Journal Info Block's. They can turn a journal macOS opens into
   `ErrJournaled`
   ([go-filesystems/hfsplus#48](https://github.com/go-filesystems/hfsplus/issues/48)).
 - Read-only `Open` is unchanged: it reads a journaled volume whatever its
@@ -83,7 +85,7 @@ A barrier is `File.Sync` (`F_FULLFSYNC` on macOS); the counts per commit are:
 | `DurabilityLazy` | 1 | 0 | 0 | 2 | no, only after `Sync` or `Close` | marked dirty until `Sync` or `Close` |
 
 Measured against macOS's own HFS+ driver (v0.12.2, 2026-11-16, 1-minute load
-4.2 to 4.75, 30 interleaved rounds, opt-in test `measure_darwin_test.go` with
+4.19 to 4.75, 30 interleaved rounds, opt-in test `measure_darwin_test.go` with
 `HFSPLUS_MEASURE=1`), create + 1 byte + fsync:
 
 | Driver | Time | Against macOS |
