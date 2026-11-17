@@ -31,6 +31,28 @@ Implements [`filesystem.Filesystem`]({{< relref "../interface.md" >}}). No cgo, 
 - Symlinks and hardlinks; chmod/chown/chtimes (type-assert the optional interfaces)
 - Multi-vdev (mirror / RAID-Z) pools opened read via `OpenFromDevices`
 
+## Parallel reads {#parallel-reads}
+
+Since v0.8.0 the records of a read are read, checksum-verified (a damaged copy
+falls back to the block's other DVAs) and decompressed on up to
+`min(GOMAXPROCS, 8)` goroutines (`inflight.Ordered`: bounded, file order kept;
+`SetReadParallelism(n)`, 1 = serial), and `ReadAt` keeps decoded records in a
+bounded adaptive cache (`inflight.Cache`, 8 MiB growing to 256 MiB only when it
+evicts records it is asked for again; `SetMaxDataCache`). One 256 MiB text-like
+file against the OpenZFS 2.4.1 kernel (4 vCPU VM, regimes calibrated and uniform),
+sequential read at 4 CPUs, MiB/s:
+
+| data | kernel | v0.7.3 | v0.8.0 |
+|---|---:|---:|---:|
+| off, fletcher4 | 3865 | 4297 | 5199 |
+| lz4 | 2072 | 1895 | 3361 |
+| zstd | 1000 | 743 | 1876 |
+
+At one CPU the sequential figures are unchanged. Random 4 KiB reads of compressed
+data, warm: lz4 88 k reads/s against the kernel's 27 k (v0.7.3: 15 k), zstd 86 k
+against 9.9 k (5.9 k). Still behind the kernel: sequential zstd at one CPU (795
+against 924 MiB/s) and random reads of uncompressed data (0.43 to 0.57 x).
+
 ## Not implemented {#not-implemented}
 
 - The writer only targets a single dataset in a single-vdev pool (the reader
