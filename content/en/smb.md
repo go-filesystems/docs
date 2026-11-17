@@ -7,7 +7,8 @@ weight: 25
 
 [`go-filesystems/smb`](https://github.com/go-filesystems/smb) is a pure-Go SMB2
 server that exports any `Filesystem`, so a disk image can be mounted by the file
-manager of Windows, macOS or Linux. Release: **v0.15.0**. This page is written
+manager of Windows, macOS or Linux. Release: **v0.16.1** (the README below is
+at v0.15.0). This page is written
 from the [README](https://github.com/go-filesystems/smb/blob/v0.15.0/README.md)
 at that tag and the release notes of v0.14.0 and v0.15.0; where it differs from
 the repository, the repository wins.
@@ -35,6 +36,16 @@ the repository, the repository wins.
   `Server.MaxPreAuthConnections`, `Server.PreAuthTimeout` and
   `Server.IdleTimeout` bound the connections and what an unauthenticated one may
   hold.
+
+## v0.16.0 and v0.16.1: per-source caps {#v016}
+
+- **v0.16.0**: the connections one source may hold are capped.
+- **v0.16.1**: a zoned link-local source is keyed by its /64.
+
+Release notes: [v0.16.0](https://github.com/go-filesystems/smb/releases/tag/v0.16.0),
+[v0.16.1](https://github.com/go-filesystems/smb/releases/tag/v0.16.1). The values
+used by theca v0.6.1 (32 per source, 16 pre-auth; loopback is not exempt) are
+from its CHANGELOG.
 
 ## Measured, and where {#measured}
 
