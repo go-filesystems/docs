@@ -37,12 +37,28 @@ over whatever was written around it, so:
 - A **journaled volume with an empty journal** (start == end, what a clean
   unmount leaves) is written directly. The journal info block, the journal and
   the journaled attribute are left as they were, so macOS replays nothing at
-  the next mount.
+  the next mount. Since v0.12.3 the first commit that changes anything, on
+  every volume, journaled or not, stamps `lastMountedVersion` =
+  `'GoHF'` into both volume headers (TN1150: an implementation that modifies
+  the volume sets this field). It is not `'HFSJ'`, because this driver does not
+  maintain the journal; writing through the journal
+  ([go-filesystems/hfsplus#45](https://github.com/go-filesystems/hfsplus/issues/45))
+  will switch it to `'HFSJ'`.
 - A **journal with transactions in it**, or one that cannot be verified (a bad
   checksum, a journal outside the volume or on another device), is refused by
   `OpenWritable` and `OpenFileWritable` with the typed error `ErrJournaled`.
   Nothing is written, and `OpenFileWritable` closes the file. Test it with
-  `errors.Is(err, hfsplus.ErrJournaled)`.
+  `errors.Is(err, hfsplus.ErrJournaled)`. Since v0.12.3 the header checks follow
+  Apple's `journal_open` (`core/hfs_journal.c`, hfs-715.100.10): a journal is
+  refused when `jhdr_size` is 0, the journal size is outside [256 KiB, 1 GiB],
+  or start or end is 0, beyond the journal size, beyond 1 GiB, or not a
+  multiple of 512. Two bounds guards protect our reader: `jhdr_size` at least
+  the 44-byte header and at most the journal size. Three older checks stay
+  stricter than Apple's: the magic (we accept only `JNLx`, Apple also accepts
+  `JHDR`, which we refuse), the endian field, and the journal size recorded in
+  the journal header against the Journal Info Block's. They can turn a journal macOS opens into
+  `ErrJournaled`
+  ([go-filesystems/hfsplus#48](https://github.com/go-filesystems/hfsplus/issues/48)).
 - Read-only `Open` is unchanged: it reads a journaled volume whatever its
   journal holds. A caller that gets `ErrJournaled` can fall back to it.
 - Volumes made by `Format` and `Mkfs` are not journaled.
@@ -67,6 +83,22 @@ A barrier is `File.Sync` (`F_FULLFSYNC` on macOS); the counts per commit are:
 | `DurabilityStrict` (default) | 3 | 3 | 3 | 1 | yes | marked clean |
 | `DurabilityMounted` | 2 | 1 | 2 | 1 | yes | marked dirty until `Sync` or `Close` |
 | `DurabilityLazy` | 1 | 0 | 0 | 2 | no, only after `Sync` or `Close` | marked dirty until `Sync` or `Close` |
+
+Measured against macOS's own HFS+ driver (v0.12.2, 2026-11-16, 1-minute load
+4.19 to 4.75, 30 interleaved rounds, opt-in test `measure_darwin_test.go` with
+`HFSPLUS_MEASURE=1`), create + 1 byte + fsync:
+
+| Driver | Time | Against macOS |
+|---|--:|--:|
+| macOS | 5.13 ms | 1.00x |
+| `DurabilityStrict` | 12.66 ms | 2.47x |
+| `DurabilityMounted` | 8.20 ms | 1.60x |
+| `DurabilityLazy` | 0.095 ms | not durable until `Sync` |
+
+The same 6 barriers over plain fsync(2) cost 0.29 ms, so the gap is the
+`F_FULLFSYNC` count. Closing it is
+[go-filesystems/hfsplus#45](https://github.com/go-filesystems/hfsplus/issues/45);
+the design is `docs/design/journal-write.md` in the hfsplus repository.
 
 - **`DurabilityMounted`** behaves like a mounted HFS+ volume (Apple TN1150) and
   is data-ordered, like ext4 `data=ordered`: a commit that wrote file data puts a
