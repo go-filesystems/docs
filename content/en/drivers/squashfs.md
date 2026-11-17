@@ -56,8 +56,33 @@ against the Linux kernel (7.0, 4 vCPU VM), MiB/s:
 | lz4 | 1232.3 | 1909.3 | 977.4 | 3136.5 |
 | lzo | 685.5 | 623.3 | 588.0 | 1649.3 |
 
-Single-core xz, gzip, zstd and lzo are still behind the kernel. Random 4 KiB
-reads are unchanged (and about 10x slower than the kernel's page cache path).
+Single-core xz, gzip, zstd and lzo are still behind the kernel.
+
+## Random reads {#random-reads}
+
+Since v0.9.0 the decoded-data cache adapts to random access. It starts at 64
+blocks (8 MiB at 128 KiB) and grows, by 1/16 at a time, only when a block it
+evicted is requested again: a random read of a file larger than the cache does,
+one sequential pass does not. The growth stops at `DefaultMaxDataCacheBytes`
+(256 MiB of decoded blocks); `(*FS).SetMaxDataCache(bytes)` sets another bound
+at any time, and a cache already above it shrinks. Memory therefore reaches
+256 MiB only for a workload that has shown it needs it.
+
+20000 random 4 KiB reads over a 256 MiB file, against the Linux kernel (7.0,
+4 vCPU VM), reads per second. Cold: caches dropped before the pass. Warm: the
+same offsets again.
+
+| compressor | cold: kernel | cold: v0.8.1 | cold: v0.9.0 | warm: kernel | warm: v0.9.0 |
+|---|---:|---:|---:|---:|---:|
+| xz | 3798 | 325 | 2951 | 1573429 | 3034088 |
+| gzip | 21875 | 2030 | 16326 | 1513661 | 2853186 |
+| zstd | 51286 | 6737 | 45869 | 1596586 | 2184032 |
+| lzo | 60764 | 5242 | 52636 | 1676534 | 2978674 |
+| lz4 | 84994 | 21881 | 109138 | 1566188 | 2675033 |
+
+Before, the 8 MiB cache held 3 % of the file and 20000 reads decoded about 19400
+blocks where the kernel's page cache decoded 2048. Cold, ours is now at 75 to
+89 % of the kernel for xz, gzip, lzo and zstd and 128 % for lz4.
 
 ## Install {#install}
 
