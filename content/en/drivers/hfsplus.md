@@ -79,7 +79,7 @@ over whatever was written around it, so:
   On a journal macOS wrote, the replayed volume lists the same 200 files with
   the same bytes as macOS's own mount. The journal is untrusted input: every
   size and offset is bounded. The two fuzz targets found no failure, but only in
-  runs on a heavily loaded machine, and two later runs stalled at 0 execs/sec
+  runs on a heavily loaded machine, and two other runs stalled at 0 execs/sec
   for a reason not yet found. More than 256 MiB of pending data is refused with
   `ErrReplayBudget`; that limit is ours, Apple's code has none. Writing such a
   volume is still refused (`ErrJournaled`). Fuzzing at low machine load, and
