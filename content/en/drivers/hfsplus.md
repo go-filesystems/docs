@@ -44,11 +44,39 @@ over whatever was written around it, so:
   maintain the journal; writing through the journal
   ([go-filesystems/hfsplus#45](https://github.com/go-filesystems/hfsplus/issues/45))
   will switch it to `'HFSJ'`.
-- A **journal with transactions in it**, or one that cannot be verified (a bad
-  checksum, a journal outside the volume or on another device), is refused by
-  `OpenWritable` and `OpenFileWritable` with the typed error `ErrJournaled`.
-  Nothing is written, and `OpenFileWritable` closes the file. Test it with
-  `errors.Is(err, hfsplus.ErrJournaled)`. Since v0.12.3 the header checks follow
+- Since v0.14.0, a **journal with transactions in it** on a volume last
+  mounted by a journaling implementation (`lastMountedVersion == 'HFSJ'`,
+  TN1150) is **replayed onto the volume** by `OpenWritable`, `OpenWritableAt`
+  and `OpenFileWritable`, then opened as above. The order is:
+  1. the replayed blocks;
+  2. a barrier;
+  3. the journal header with `start = end`;
+  4. a barrier.
+
+  A crash at any point leaves either a journal that still replays to the same
+  result, or the fully replayed volume. This is stricter than macOS, which
+  flushes only after the header (`hfs_journal.c:515-539`). It costs 2 barriers
+  at open, at every durability level; a barrier is `F_FULLFSYNC` on darwin. On
+  a journal macOS wrote, macOS then lists our replay plus a new file, and
+  `fsck_hfs -fn` exits 0. Replayed blocks are bounded by the image size and
+  never overlap the journal.
+- These are still refused by the writable opens with the typed error
+  `ErrJournaled`; test it with `errors.Is(err, hfsplus.ErrJournaled)`:
+  - a journal with transactions on a volume **not** marked `'HFSJ'`. macOS
+    discards such a journal (`hfs_vfsutils.c:723-727`, `:2886-2895`); we keep
+    it, because it may hold the only copy of metadata. Mount and unmount the
+    volume on macOS first;
+  - a journal with transactions when the writer has no `Sync`. Without a
+    barrier, an emptied header could land over blocks that never did;
+  - a replay that rewrites the journal info block so the journal no longer
+    looks empty;
+  - a journal that cannot be verified: a bad checksum, or a journal outside
+    the volume or on another device.
+
+  `OpenFileWritable` closes the file it opened. Nothing is written in these
+  cases, except the last-but-one: there the replay has already been written
+  when the check refuses. An error part-way through a replay is crash-safe in
+  the same way as a crash. Since v0.12.3 the header checks follow
   Apple's `journal_open` (`core/hfs_journal.c`, hfs-715.100.10): a journal is
   refused when `jhdr_size` is 0, the journal size is outside [256 KiB, 1 GiB],
   or start or end is 0, beyond the journal size, beyond 1 GiB, or not a
@@ -81,8 +109,9 @@ over whatever was written around it, so:
   size and offset is bounded. The two fuzz targets found no failure, but only in
   runs on a heavily loaded machine, and two other runs stalled at 0 execs/sec
   for a reason not yet found. More than 256 MiB of pending data is refused with
-  `ErrReplayBudget`; that limit is ours, Apple's code has none. Writing such a
-  volume is still refused (`ErrJournaled`). Fuzzing at low machine load, and
+  `ErrReplayBudget`; that limit is ours, Apple's code has none. Since v0.14.0 the
+  writable opens replay onto the volume with the same replayer (above). Fuzzing
+  at low machine load, and
   explaining the stall, are still to be done
   ([go-filesystems/hfsplus#51](https://github.com/go-filesystems/hfsplus/issues/51)).
 - Volumes made by `Format` and `Mkfs` are not journaled.
