@@ -68,14 +68,17 @@ over whatever was written around it, so:
     volume on macOS first;
   - a journal with transactions when the writer has no `Sync`. Without a
     barrier, an emptied header could land over blocks that never did;
-  - a replay that rewrites the journal info block so the journal no longer
-    looks empty;
+  - a replay that rewrites the journal info block so that it makes the journal
+    unreadable;
+  - a journal the replayer itself refuses (`ErrJournalReplay`,
+    `ErrReplayBudget`, or a replayed block inside the journal). Both errors
+    wrap `ErrJournaled`;
   - a journal that cannot be verified: a bad checksum, or a journal outside
     the volume or on another device.
 
   `OpenFileWritable` closes the file it opened. Nothing is written in these
-  cases, except the last-but-one: there the replay has already been written
-  when the check refuses. An error part-way through a replay is crash-safe in
+  cases, except the journal-info-block case: there the replay has already been
+  written when the check refuses. An error part-way through a replay is crash-safe in
   the same way as a crash. Since v0.12.3 the header checks follow
   Apple's `journal_open` (`core/hfs_journal.c`, hfs-715.100.10): a journal is
   refused when `jhdr_size` is 0, the journal size is outside [256 KiB, 1 GiB],
