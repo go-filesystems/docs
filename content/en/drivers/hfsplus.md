@@ -59,8 +59,32 @@ over whatever was written around it, so:
   the journal header against the Journal Info Block's. They can turn a journal macOS opens into
   `ErrJournaled`
   ([go-filesystems/hfsplus#48](https://github.com/go-filesystems/hfsplus/issues/48)).
-- Read-only `Open` is unchanged: it reads a journaled volume whatever its
-  journal holds. A caller that gets `ErrJournaled` can fall back to it.
+- Read-only `Open` reads a journaled volume whatever its journal holds. By
+  default it reads the blocks in place, which can be stale for metadata still in
+  the journal. A caller that gets `ErrJournaled` can fall back to it.
+- Since v0.13.0, `Open(r, size, hfsplus.WithJournalReplay())` (and the same
+  option on `OpenFile`) replays the journal into memory first, read-only, and
+  serves the volume as macOS would mount it. The image is never written, and
+  the size must be known (not -1). The
+  replayer ports Apple's `replay_journal` (`core/hfs_journal.c`,
+  hfs-715.100.10):
+  - a transaction starts at a block list marked `BLHDR_FIRST_HEADER`;
+  - replay reads past `end` while the sequence number stays equal or goes up
+    by one;
+  - a torn block drops its transaction;
+  - a bad block list header inside the journal's `start`..`end` range drops
+    that transaction AND the one before it; past `end`, a bad list just ends
+    the read.
+
+  On a journal macOS wrote, the replayed volume lists the same 200 files with
+  the same bytes as macOS's own mount. The journal is untrusted input: every
+  size and offset is bounded. The two fuzz targets found no failure, but only in
+  runs on a heavily loaded machine, and two other runs stalled at 0 execs/sec
+  for a reason not yet found. More than 256 MiB of pending data is refused with
+  `ErrReplayBudget`; that limit is ours, Apple's code has none. Writing such a
+  volume is still refused (`ErrJournaled`). Fuzzing at low machine load, and
+  explaining the stall, are still to be done
+  ([go-filesystems/hfsplus#51](https://github.com/go-filesystems/hfsplus/issues/51)).
 - Volumes made by `Format` and `Mkfs` are not journaled.
 
 {{< callout type="warning" >}}
