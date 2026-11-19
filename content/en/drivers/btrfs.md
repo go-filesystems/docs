@@ -28,6 +28,23 @@ Implements [`filesystem.Filesystem`]({{< relref "../interface.md" >}}). No cgo, 
 
 - Snapshots, send/receive, multi-device/RAID, quotas and reflink are not implemented
 
+## Parallel reads {#parallel-reads}
+
+Since v0.6.0 the compressed extents (zlib, LZO, zstd) of a file are read and decoded in
+parallel by `ReadFile` and `OpenFile().ReadAt` (`inflight.Ordered`: bounded,
+file order kept, the first error in file order; `SetReadParallelism(n)`, default
+`min(GOMAXPROCS, 8)`, 1 = serial). Sequential read of a 256 MiB text-like file
+the Linux kernel (6.17, 4 vCPU VM) wrote with `compress-force`, MiB/s:
+
+| codec | kernel 1 CPU | ours 1 CPU | kernel 4 CPUs | ours 4 CPUs |
+|---|---:|---:|---:|---:|
+| lzo | 1169 | 1376 | 3317 | 2536 |
+| zstd | 809 | 1175 | 2471 | 2290 |
+| zlib | 360 | 303 | 1233 | 924 |
+
+Before (v0.5.6, serial): 4 CPUs 1326 (lzo), 667 (zstd), 236 (zlib). Still behind
+the kernel: zlib at 1 and 4 CPUs, lzo at 4 CPUs.
+
 ## Untrusted input {#untrusted-input}
 
 Every allocation, walk and recursion sized from a value on the image is checked
