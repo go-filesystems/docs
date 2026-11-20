@@ -40,10 +40,30 @@ over whatever was written around it, so:
   the next mount. Since v0.12.3 the first commit that changes anything, on
   every volume, journaled or not, stamps `lastMountedVersion` =
   `'GoHF'` into both volume headers (TN1150: an implementation that modifies
-  the volume sets this field). It is not `'HFSJ'`, because this driver does not
-  maintain the journal; writing through the journal
-  ([go-filesystems/hfsplus#45](https://github.com/go-filesystems/hfsplus/issues/45))
-  will switch it to `'HFSJ'`.
+  the volume sets this field). It is not `'HFSJ'`, because these direct writes
+  do not maintain the journal. Writing through the journal (below) stamps
+  `'HFSJ'`.
+- Since v0.15.0, **`(*Volume).EnableJournalWrites()`** (opt-in) sends commits
+  that change only metadata through the journal, as macOS's own driver does,
+  and stamps `'HFSJ'`. A commit costs 2 barriers for a session's first commit
+  and 1 after that, against 3 at `DurabilityStrict`. It works only at
+  `DurabilityStrict`. A commit falls back to the direct path, after the journal
+  is emptied (barrier, empty header, barrier), when it writes file data, needs
+  more than 30 runs, does not fit the journal, or has a run that is not 512-byte
+  aligned. It is refused with `ErrJournalWritesUnavailable` on a volume that is
+  not journaled, a journal that holds transactions or was never initialised,
+  a `jhdr_size` other than 512, or a writer without `Sync`. Checked:
+  - our replayer finds no wrong state on any crash image of commits, `Close`
+    and `SetDurability`;
+  - 820 distinct crash images all mount on macOS, and `fsck_hfs -fn` exits 0
+    after the mount.
+
+  A raw `fsck_hfs -fn` run before any mount, on an image cut mid-commit, cannot
+  verify it: 407 of the 820 exit non-zero with "could not be verified
+  completely". The kernel mounts them all. The reason is not established. No
+  file data is journaled, and the encoder writes only inside the journal.
+  Journal writes are PR 3 of 7 of
+  [go-filesystems/hfsplus#45](https://github.com/go-filesystems/hfsplus/issues/45).
 - Since v0.14.0, a **journal with transactions in it** on a volume last
   mounted by a journaling implementation (`lastMountedVersion == 'HFSJ'`,
   TN1150) is **replayed onto the volume** by `OpenWritable`, `OpenWritableAt`
@@ -152,7 +172,11 @@ Measured against macOS's own HFS+ driver (v0.12.2, 2026-11-16, 1-minute load
 | `DurabilityLazy` | 0.095 ms | not durable until `Sync` |
 
 The same 6 barriers over plain fsync(2) cost 0.29 ms, so the gap is the
-`F_FULLFSYNC` count. Closing it is
+`F_FULLFSYNC` count. With `EnableJournalWrites` (v0.15.0), a steady-state
+metadata commit measured 4.2 ms with 1 barrier, the same as
+`DurabilityMounted`, on a loaded machine. The design's 2.5-3 ms estimate is not
+met. The likely reason, not measured: the kernel's journal barrier is a
+`DKIOCSYNCHRONIZE` barrier request, cheaper than `F_FULLFSYNC`. Closing it is
 [go-filesystems/hfsplus#45](https://github.com/go-filesystems/hfsplus/issues/45);
 the design is `docs/design/journal-write.md` in the hfsplus repository.
 
