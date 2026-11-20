@@ -53,6 +53,16 @@ data, warm: lz4 88 k reads/s against the kernel's 27 k (v0.7.3: 15 k), zstd 86 k
 against 9.9 k (5.9 k). Still behind the kernel: sequential zstd at one CPU (795
 against 924 MiB/s) and random reads of uncompressed data (0.43 to 0.57 x).
 
+Since v0.8.4 a sequential pass allocates nothing per record for data stored as it
+is (no compression, no encryption): a request of a record or more is read and
+verified straight into the caller's buffer the first time, and the record is
+cached only when it is read a second time (admission on second touch,
+`inflight.Cache.Seen`), so a stream read once does not churn the Go heap and a
+region read again is cached as before. `Open` no longer decodes the pool's data
+blocks. In the 1-CPU VM a sequential pass after a random phase went from 3256 to
+4668 MiB/s (4 CPUs: 3641 to 5349); it had read 10 to 27 % lower than without the
+random phase, because of the allocations (zfs#73).
+
 ## Not implemented {#not-implemented}
 
 - The writer only targets a single dataset in a single-vdev pool (the reader
