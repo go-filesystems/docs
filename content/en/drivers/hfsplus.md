@@ -62,6 +62,27 @@ over whatever was written around it, so:
   verify it: 407 of the 820 exit non-zero with "could not be verified
   completely". The kernel mounts them all. The reason is not established. No
   file data is journaled, and the encoder writes only inside the journal.
+
+  **Security, v0.15.1:** upgrade from v0.15.0 if you use `EnableJournalWrites`
+  ([go-filesystems/hfsplus#56](https://github.com/go-filesystems/hfsplus/issues/56)).
+  After a crash, replay reads past the journal's `end` and accepts a sector
+  there as a block list header when its 32-byte checksum verifies and its
+  sequence number is guessable (Apple `hfs_journal.c:1225-1298`). Journaled
+  catalog nodes hold file names a user chooses, so a crafted sector left in the
+  ring could make replay write blocks anywhere on the volume. Since v0.15.1:
+  - every 512-byte sector a commit would journal is checked against that
+    checksum in both byte orders, and a commit that holds one takes the direct
+    path, so the sector never reaches the ring. Every commit touching the same
+    catalog node falls back, whoever makes it;
+  - the writer never emits sequence number 0, and `EnableJournalWrites` refuses
+    a journal whose `start` or `end` is not sector-aligned.
+
+  Shown: our own replayer follows such a forged list without the guard.
+  Unproven: whether a file name can be placed on a sector boundary through the
+  API, and whether the kernel or `fsck_hfs` follows the forged list. A sector
+  already in a ring written before v0.15.1 is not removed, and a clean unmount
+  does not remove it either
+  ([go-filesystems/hfsplus#58](https://github.com/go-filesystems/hfsplus/issues/58)).
   Journal writes are PR 3 of 7 of
   [go-filesystems/hfsplus#45](https://github.com/go-filesystems/hfsplus/issues/45).
 - Since v0.14.0, a **journal with transactions in it** on a volume last
