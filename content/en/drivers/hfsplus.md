@@ -79,10 +79,19 @@ over whatever was written around it, so:
 
   Shown: our own replayer follows such a forged list without the guard.
   Unproven: whether a file name can be placed on a sector boundary through the
-  API, and whether the kernel or `fsck_hfs` follows the forged list. A sector
-  already in a ring written before v0.15.1 is not removed, and a clean unmount
-  does not remove it either
-  ([go-filesystems/hfsplus#58](https://github.com/go-filesystems/hfsplus/issues/58)).
+  API, and whether the kernel or `fsck_hfs` follows the forged list.
+
+  Since v0.15.2
+  ([go-filesystems/hfsplus#58](https://github.com/go-filesystems/hfsplus/issues/58)),
+  forged sectors already in the ring are removed too: one written by v0.15.0, or
+  by another implementation. A clean unmount does not remove them. The first
+  journaled commit of a session scans the ring once and zeroes every sector
+  that verifies as a header, in either byte order. This happens only after
+  re-reading the journal header and finding the journal empty, and the scan
+  never touches the journal header or info block. If anything was zeroed, one
+  barrier follows before the first transaction: that commit costs 3 barriers
+  instead of 2, and later commits still cost 1. The scan reads the whole ring
+  once per session, up to 1 GiB, in 64 KiB chunks.
   Journal writes are PR 3 of 7 of
   [go-filesystems/hfsplus#45](https://github.com/go-filesystems/hfsplus/issues/45).
 - Since v0.14.0, a **journal with transactions in it** on a volume last
