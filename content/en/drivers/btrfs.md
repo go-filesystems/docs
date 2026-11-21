@@ -45,6 +45,16 @@ the Linux kernel (6.17, 4 vCPU VM) wrote with `compress-force`, MiB/s:
 Before (v0.5.6, serial): 4 CPUs 1326 (lzo), 667 (zstd), 236 (zlib). Still behind
 the kernel: zlib at 1 and 4 CPUs, lzo at 4 CPUs.
 
+Since v0.6.1 the Adler-32 trailer of a zlib extent is checked with
+`go-simd/adler32` (NEON, AVX2, AVX-512) over raw DEFLATE, instead of the scalar
+sum, which was about 14 % of a 128 KiB extent's decode time. Against the kernel
+in the same run, zlib reads go from 0.88 to 0.91 of its speed at 1 CPU (285 / 324
+to 325 / 357 MiB/s) and from 0.70 to 0.78 at 4 CPUs (824 / 1179 to 939 / 1212);
+inflate itself is still the cost. A later run of v0.6.1 (kernel / ours, 1 and 4
+CPUs) gave zlib 345 / 304 and 1204 / 839, lzo 1058 / 1334 and 3093 / 2322, so the
+VM's run-to-run spread is up to about 10 % and the 4-CPU lzo ratio sits around
+0.75 to 0.79.
+
 ## Untrusted input {#untrusted-input}
 
 Every allocation, walk and recursion sized from a value on the image is checked
