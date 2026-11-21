@@ -48,7 +48,7 @@ over whatever was written around it, so:
   and stamps `'HFSJ'`. A commit costs 2 barriers for a session's first commit
   and 1 after that, against 3 at `DurabilityStrict`. It works only at
   `DurabilityStrict`. A commit falls back to the direct path, after the journal
-  is emptied (barrier, empty header, barrier), when it writes file data, needs
+  is emptied (barrier, empty header, barrier), when it needs
   more than 30 runs, does not fit the journal, or has a run that is not 512-byte
   aligned. It is refused with `ErrJournalWritesUnavailable` on a volume that is
   not journaled, a journal that holds transactions or was never initialised,
@@ -60,8 +60,30 @@ over whatever was written around it, so:
 
   A raw `fsck_hfs -fn` run before any mount, on an image cut mid-commit, cannot
   verify it: 407 of the 820 exit non-zero with "could not be verified
-  completely". The kernel mounts them all. The reason is not established. No
-  file data is journaled, and the encoder writes only inside the journal.
+  completely". The kernel mounts them all. The reason is not established. The
+  encoder writes only inside the journal.
+
+  Since v0.16.0 commits that write **file data** stay in journal mode.
+  - **Small data**, up to min(1 MiB, (journal size − 512) / 8), is journaled
+    with its metadata, then written in place: 1 barrier, 2 on a session's
+    first commit.
+  - **Large data** is written in place, then a barrier, then the metadata
+    commit: 2 barriers, 3 on the first.
+  - **Revoke rule:** a block that one of the last three transactions journaled
+    is never overwritten in place by unjournaled data, because replay would
+    put its old bytes back. Such a write is journaled too, or the allocator
+    skips the block.
+  - **Forged sectors:** file data passes the same forged-sector check as
+    metadata. A data sector that would pass as a header takes the large-data
+    path and never enters the ring.
+
+  A crash oracle checks every file's bytes after replay, over about 137,000
+  images, with barrier groups landing in order and in reverse. After any crash
+  a file reads its old or its new contents, never another file's stale bytes.
+  On macOS, 24,144 distinct crash images pass. Not covered: the emulated CI
+  lanes skip the data oracles, and no oracle builds a big-endian journal
+  ([go-filesystems/hfsplus#61](https://github.com/go-filesystems/hfsplus/issues/61)).
+  Timing against macOS has not been measured yet.
 
   **Security, v0.15.1:** upgrade from v0.15.0 if you use `EnableJournalWrites`
   ([go-filesystems/hfsplus#56](https://github.com/go-filesystems/hfsplus/issues/56)).
