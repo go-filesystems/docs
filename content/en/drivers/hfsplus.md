@@ -83,7 +83,8 @@ over whatever was written around it, so:
   On macOS, 24,144 distinct crash images pass. Not covered: the emulated CI
   lanes skip the data oracles, and no oracle builds a big-endian journal
   ([go-filesystems/hfsplus#61](https://github.com/go-filesystems/hfsplus/issues/61)).
-  Timing against macOS has not been measured yet.
+  On a quiet machine, create + 1 byte + fsync takes 4.37 ms, against 9.41 ms
+  for macOS on Journaled HFS+ (see [Durability levels](#durability)).
 
   **Security, v0.15.1:** upgrade from v0.15.0 if you use `EnableJournalWrites`
   ([go-filesystems/hfsplus#56](https://github.com/go-filesystems/hfsplus/issues/56)).
@@ -224,10 +225,24 @@ Measured against macOS's own HFS+ driver (v0.12.2, 2026-11-16, 1-minute load
 | `DurabilityLazy` | 0.095 ms | not durable until `Sync` |
 
 The same 6 barriers over plain fsync(2) cost 0.29 ms, so the gap is the
-`F_FULLFSYNC` count. With `EnableJournalWrites` (v0.15.0), a steady-state
-metadata commit measured 4.2 ms with 1 barrier, the same as
-`DurabilityMounted`, on a loaded machine. The design's 2.5-3 ms estimate is not
-met. The likely reason, not measured: the kernel's journal barrier is a
+`F_FULLFSYNC` count.
+
+Re-measured at v0.16.0 (2026-11-21, 1-minute load 4.85 to 5.29, same test, 30
+interleaved rounds, medians of rounds 2-30), create + 1 byte + fsync:
+
+| Driver | Time | Barriers |
+|---|--:|--:|
+| macOS, HFS+ | 5.24 ms | (kernel) |
+| macOS, Journaled HFS+ | 9.41 ms | (kernel) |
+| `DurabilityStrict`, Journaled HFS+ image | 13.41 ms | 3 |
+| `DurabilityMounted` | 8.84 ms | 2 |
+| `EnableJournalWrites`, Journaled HFS+ image | **4.37 ms** | 1 |
+
+On a journaled image, journal writes are 3.1x faster than `DurabilityStrict`
+and 2.2x faster than macOS's own driver on the same kind of volume.
+Metadata-only operations (mkdir, Chtimes) cost about 4.25 ms, the same as
+`DurabilityMounted`. This is one run on one machine. The design's 2.5-3 ms
+estimate is still not met, because one `F_FULLFSYNC` costs about 4 ms here. The likely reason, not measured: the kernel's journal barrier is a
 `DKIOCSYNCHRONIZE` barrier request, cheaper than `F_FULLFSYNC`. Closing it is
 [go-filesystems/hfsplus#45](https://github.com/go-filesystems/hfsplus/issues/45);
 the design is `docs/design/journal-write.md` in the hfsplus repository.
