@@ -82,6 +82,15 @@ Ratio ours / kernel in the same VM run, medians of 5, sequential read of the
 zlib and lzo at 4 CPUs are now ahead of the kernel; zstd at 4 CPUs is still behind
 ([btrfs#56](https://github.com/go-filesystems/btrfs/issues/56) stays open for it).
 
+Since v0.6.5 a zstd extent is decoded as exactly one frame, the rule the kernel
+follows (`fs/btrfs/zstd.c`): the end of the frame is found from its block headers
+([RFC 8878](https://www.rfc-editor.org/rfc/rfc8878) section 3.1.1), the sector padding
+after it is never decoded, and a truncated frame, a skippable frame, a reserved block
+type or a frame that yields fewer bytes than `ram_bytes` is refused. The output is one
+buffer per extent: 1 allocation per 128 KiB extent instead of 2 (counted on the host).
+The effect of this on the 4 CPU zstd ratio (0.78) is not yet measured: the host load
+stayed at 10 or above all afternoon, and a time taken under load is not published.
+
 ## Untrusted input {#untrusted-input}
 
 Every allocation, walk and recursion sized from a value on the image is checked
