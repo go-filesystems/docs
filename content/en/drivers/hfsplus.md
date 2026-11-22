@@ -48,9 +48,10 @@ over whatever was written around it, so:
   and stamps `'HFSJ'`. A commit costs 2 barriers for a session's first commit
   and 1 after that, against 3 at `DurabilityStrict`. It works only at
   `DurabilityStrict`. A commit falls back to the direct path, after the journal
-  is emptied (barrier, empty header, barrier), when it needs
-  more than 30 runs, does not fit the journal, or has a run that is not 512-byte
-  aligned. It is refused with `ErrJournalWritesUnavailable` on a volume that is
+  is emptied (barrier, empty header, barrier), when it needs more than 30 runs,
+  does not fit even an empty journal, or has a run that is not 512-byte aligned.
+  Since v0.17.0 a commit that fits an empty journal but not the live one
+  empties the journal and stays in journal mode (4 barriers; see below). It is refused with `ErrJournalWritesUnavailable` on a volume that is
   not journaled, a journal that holds transactions or was never initialised,
   a `jhdr_size` other than 512, or a writer without `Sync`. Checked:
   - our replayer finds no wrong state on any crash image of commits, `Close`
@@ -85,6 +86,27 @@ over whatever was written around it, so:
   ([go-filesystems/hfsplus#61](https://github.com/go-filesystems/hfsplus/issues/61)).
   On a quiet machine, create + 1 byte + fsync takes 4.37 ms, against 9.41 ms
   for macOS on Journaled HFS+ (see [Durability levels](#durability)).
+
+  Since v0.17.0, a full journal, `Close`, `Sync` and level switches follow
+  macOS:
+  - **Journal full:** the journal is emptied and the commit is written as a
+    session's first commit, 4 barriers in all. Sequence numbers continue from
+    the previous transaction. Ordinary commits on a journal of 256 KiB or more
+    (the smallest the driver opens, as Apple's `journal_open`) never reach
+    this. The tests force it, and no test yet reaches it through the API
+    ([go-filesystems/hfsplus#64](https://github.com/go-filesystems/hfsplus/issues/64)).
+  - **`Close`** commits a last transaction that sets the clean-unmount bit,
+    writes it in place, then empties the journal: 3 barriers. The volume is
+    left as macOS leaves it after unmount. When two steps fail, `Close`
+    returns both errors (`errors.Join`).
+  - **`Sync`** issues 1 barrier when in-place writes are pending, and none
+    otherwise.
+  - **Leaving `DurabilityStrict`** empties the journal first (2 barriers), so
+    journal and direct writes never interleave.
+
+  The crash oracle replays about 28,000 crash images of these paths (wrap,
+  journal full, full across the wrap, bypass right after emptying, `Close`).
+  After an injected write or barrier failure, nothing more reaches the device.
 
   **Security, v0.15.1:** upgrade from v0.15.0 if you use `EnableJournalWrites`
   ([go-filesystems/hfsplus#56](https://github.com/go-filesystems/hfsplus/issues/56)).
