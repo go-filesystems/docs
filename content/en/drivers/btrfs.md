@@ -55,6 +55,15 @@ CPUs) gave zlib 345 / 304 and 1204 / 839, lzo 1058 / 1334 and 3093 / 2322, so th
 VM's run-to-run spread is up to about 10 % and the 4-CPU lzo ratio sits around
 0.75 to 0.79.
 
+Since v0.6.3 a `ReadAt` that continues the previous one, on a file with
+compressed extents and more than one worker, decodes 16 MiB at once (about 16 MiB
+of memory per open file) and serves the next calls from that window: a 1 MiB
+`ReadAt` holds only 8 extents, and decoding each call alone filled the workers and
+drained them again. Against the kernel in the same run (v0.6.2 to v0.6.3), lzo at
+4 CPUs goes from 0.78 (2377 / 3042) to 1.05 (3509 / 3327), zlib at 4 CPUs from
+0.72 to 0.87, zstd at 4 CPUs from 0.70 to 0.78; lzo at 1 CPU stays at 1.16 to 1.19.
+Still behind the kernel: zlib at 1 and 4 CPUs, zstd at 4 CPUs.
+
 ## Untrusted input {#untrusted-input}
 
 Every allocation, walk and recursion sized from a value on the image is checked
