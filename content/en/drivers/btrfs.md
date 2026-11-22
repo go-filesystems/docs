@@ -22,7 +22,7 @@ Implements [`filesystem.Filesystem`]({{< relref "../interface.md" >}}). No cgo, 
 - Read/write files
 - Directories, rename, symlinks
 - MBR/GPT auto-detect
-- Compressed extents: kernel-format zstd extents (v0.5.4/v0.5.5) and LZO through the shared `go-compressions/lzo` decoder
+- Compressed extents: kernel-format zstd extents (v0.5.4/v0.5.5) and LZO through the shared `go-compressions/lzo` decoder, zlib through `go-compressions/deflate` (v0.6.4)
 
 ## Not implemented {#not-implemented}
 
@@ -62,7 +62,25 @@ of memory per open file) and serves the next calls from that window: a 1 MiB
 drained them again. Against the kernel in the same run (v0.6.2 to v0.6.3), lzo at
 4 CPUs goes from 0.78 (2377 / 3042) to 1.05 (3509 / 3327), zlib at 4 CPUs from
 0.72 to 0.87, zstd at 4 CPUs from 0.70 to 0.78; lzo at 1 CPU stays at 1.16 to 1.19.
-Still behind the kernel: zlib at 1 and 4 CPUs, zstd at 4 CPUs.
+Still behind the kernel after v0.6.3: zlib at 1 and 4 CPUs, zstd at 4 CPUs.
+
+Since v0.6.4 zlib extents are inflated by the whole-buffer raw DEFLATE decoder of
+`go-compressions/deflate` v0.2.0 (`InflatePrefix`, which also reports where the
+stream ends so the Adler-32 trailer can be read), instead of klauspost/compress.
+On the host, one core, 128 KiB extents, the extent decode alone went from 396 MiB/s
+to 1.03 GiB/s (geometric mean of six inputs, 6 interleaved rounds against v0.6.3).
+Ratio ours / kernel in the same VM run, medians of 5, sequential read of the
+256 MiB file:
+
+| codec | CPUs | ours / kernel | MiB/s (ours / kernel) |
+|---|---:|---:|---|
+| zlib | 1 | 2.15 (v0.6.3: 0.91) | 763 / 354 |
+| zlib | 4 | 1.89 (v0.6.3: 0.87) | 2304 / 1222 |
+| lzo | 4 | 1.05 | |
+| zstd | 4 | 0.78 | |
+
+zlib and lzo at 4 CPUs are now ahead of the kernel; zstd at 4 CPUs is still behind
+([btrfs#56](https://github.com/go-filesystems/btrfs/issues/56) stays open for it).
 
 ## Untrusted input {#untrusted-input}
 
