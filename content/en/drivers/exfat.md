@@ -36,7 +36,9 @@ Implements [`filesystem.Filesystem`]({{< relref "../interface.md" >}}). No cgo, 
 Every allocation a value in the image can size is bounded before it happens: a
 cluster buffer is allocated only after the cluster's last byte has been read, and
 a directory is at most 256 MiB. A hostile image gets an error, not an
-out-of-memory kill.
+out-of-memory kill. Since v0.7.1 `DeleteDir` refuses a directory cycle before it
+frees anything (the `go-volumes/safeio` walk: `safeio.ErrCycle`, and
+`safeio.ErrTooDeep` past 256 levels).
 
 ## Install {#install}
 

@@ -101,7 +101,9 @@ mid-move. Together with
 Every allocation a value in the image can size is bounded before it happens: a
 cluster buffer is allocated only after the cluster's last byte has been read, the
 sector size is 512..4096, and a directory is at most 2 MiB. A hostile image gets
-an error, not an out-of-memory kill.
+an error, not an out-of-memory kill. Since v0.13.1 `DeleteDir` refuses a
+directory cycle (the `go-volumes/safeio` walk: `safeio.ErrCycle`, and
+`safeio.ErrTooDeep` past 256 levels).
 
 ## Install {#install}
 

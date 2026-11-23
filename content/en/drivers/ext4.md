@@ -44,7 +44,9 @@ what the image can hold before it happens. `ReadFile` is capped at the smaller o
 the declared filesystem size and `DefaultMaxReadSize` (1 GiB), changed with
 `SetMaxReadSize` and refused with `ErrTooLarge`; larger files are read with
 `OpenFile`. Overlapping extent leaves are refused and the extent tree depth is
-at most 5.
+at most 5. Since v0.5.1 `DeleteDir` refuses a directory cycle (the
+`go-volumes/safeio` walk: `safeio.ErrCycle`, and `safeio.ErrTooDeep` past 256
+levels).
 
 ## Install {#install}
 
