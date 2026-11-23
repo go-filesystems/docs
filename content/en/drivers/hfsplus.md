@@ -43,11 +43,18 @@ over whatever was written around it, so:
   the volume sets this field). It is not `'HFSJ'`, because these direct writes
   do not maintain the journal. Writing through the journal (below) stamps
   `'HFSJ'`.
-- Since v0.15.0, **`(*Volume).EnableJournalWrites()`** (opt-in) sends commits
-  that change only metadata through the journal, as macOS's own driver does,
-  and stamps `'HFSJ'`. A commit costs 2 barriers for a session's first commit
-  and 1 after that, against 3 at `DurabilityStrict`. It works only at
-  `DurabilityStrict`. A commit falls back to the direct path, after the journal
+- **Since v0.18.0, journal writes are on by default.** A writable open of a
+  journaled volume writes through its journal at `DurabilityStrict` and
+  `DurabilityMounted`, as macOS's own driver does, and stamps `'HFSJ'`. A
+  journal that fails the checks below falls back silently to direct writes,
+  exactly as in v0.17.0, and `(*Volume).JournalWritesReason()` says why. It
+  returns `nil` when journal writes are on, `ErrReadOnly` or `ErrClosed`, and
+  otherwise an error wrapping `ErrJournalWritesUnavailable`. `DurabilityLazy`
+  and `Batch` still write in place, after the journal is emptied. From v0.15.0
+  to v0.17.0 this was an opt-in, **`(*Volume).EnableJournalWrites()`**, which
+  remains and does nothing when journal writes are already on.
+  A commit costs 2 barriers for a session's first commit and 1 after that,
+  against 3 on the direct path. A commit falls back to the direct path, after the journal
   is emptied (barrier, empty header, barrier), when it needs more than 30 runs,
   does not fit even an empty journal, or has a run that is not 512-byte aligned.
   Since v0.17.0 a commit that fits an empty journal but not the live one
@@ -227,8 +234,17 @@ Since v0.12.0 a writable volume chooses, per volume, when a mutation is on the
 medium: `SetDurability(DurabilityStrict | DurabilityMounted | DurabilityLazy)`
 and `Durability()`. `Batch(fn)` runs a group of mutations at `DurabilityLazy` and
 makes them durable with one `Sync`, so the group pays one set of barriers (it is
-not a transaction). The default, `DurabilityStrict`, is unchanged from v0.11.0.
-A barrier is `File.Sync` (`F_FULLFSYNC` on macOS); the counts per commit are:
+not a transaction). A barrier is `File.Sync` (`F_FULLFSYNC` on macOS).
+
+Since v0.18.0, on a journaled volume whose journal passes the checks,
+`DurabilityStrict` (the default) and `DurabilityMounted` are both journal
+commits. Each costs 2 barriers for a session's first commit and 1 after
+that, with or without data. `Sync` costs 0 or 1, and the volume is never
+marked dirty. A commit that cannot be journaled takes the direct
+`DurabilityStrict` path at both levels (3 barriers).
+
+On a volume that is not journaled, or whose journal fails the checks, the
+counts per commit are:
 
 | Level | First commit | Next, no data | With data | `Sync` | Durable when the mutator returns | Volume between commits |
 |---|:--:|:--:|:--:|:--:|:--:|---|
@@ -269,12 +285,18 @@ estimate is still not met, because one `F_FULLFSYNC` costs about 4 ms here. The 
 `DKIOCSYNCHRONIZE` barrier request, cheaper than `F_FULLFSYNC`. Closing it is
 [go-filesystems/hfsplus#45](https://github.com/go-filesystems/hfsplus/issues/45);
 the design is `docs/design/journal-write.md` in the hfsplus repository.
+The v0.18.0 default has not been timed yet: the machine was too loaded
+(1-minute load 56 to 81). Its barrier counts are the same as the
+`EnableJournalWrites` row above.
 
 - **`DurabilityMounted`** behaves like a mounted HFS+ volume (Apple TN1150) and
   is data-ordered, like ext4 `data=ordered`: a commit that wrote file data puts a
   barrier between the data and the metadata that points at it. A crash between
   syncs leaves the volume marked dirty, so the next mount runs `fsck_hfs`, and a
-  journaled volume stays unjournaled until `diskutil enableJournal`.
+  journaled volume stays unjournaled until `diskutil enableJournal`. Since
+  v0.18.0 this applies only where journal writes are off. On a journaled
+  volume, `DurabilityMounted` is a journal commit and the volume is never
+  marked dirty.
 - **`DurabilityLazy`** is data-writeback: nothing orders file data before its
   metadata, so after a crash a file may hold stale bytes of a deleted one, and
   the mutations since the last `Sync` are lost. **Do not use it where different
