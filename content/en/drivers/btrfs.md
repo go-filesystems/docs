@@ -91,6 +91,18 @@ buffer per extent: 1 allocation per 128 KiB extent instead of 2 (counted on the 
 The effect of this on the 4 CPU zstd ratio (0.78) is not yet measured: the host load
 stayed at 10 or above all afternoon, and a time taken under load is not published.
 
+## Checksums {#checksums}
+
+Since v0.7.0 the superblock and every tree block are verified on read against
+their stored checksum, as the superblock `csum_type` selects
+([btrfs on-disk format](https://btrfs.readthedocs.io/en/latest/dev/On-disk-format.html)).
+crc32c is supported; xxhash64, sha256 and blake2b are refused with
+`*UnsupportedChecksumError`, never skipped. A mismatch returns `*ChecksumError`
+(`errors.As`); a bad primary superblock falls back to the backup copies (64 MiB,
+256 GiB, 1 PiB). Rewrites refuse a corrupt input, so a write can no longer re-seal
+tampered blocks. `OpenOptions{IgnoreChecksums: true}` is the forensic opt-out, off by
+default. Data-extent checksums are not verified yet.
+
 ## Untrusted input {#untrusted-input}
 
 Every allocation, walk and recursion sized from a value on the image is checked
