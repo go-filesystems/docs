@@ -46,8 +46,14 @@ read-modify-write, as the
 specifies (crc32c seeded with the filesystem UUID, the inode number and the inode
 generation). A mismatch returns `*ChecksumError` (`errors.As`), so a write can no
 longer re-seal tampered metadata. `Options.IgnoreChecksums` is the forensic opt-out,
-off by default. Extent-tree block checksums are not enforced yet
-([ext4#46](https://github.com/go-filesystems/ext4/issues/46)).
+off by default.
+
+Since v0.7.0 the extent-tree block checksums (`ext4_extent_tail`, crc32c seeded with the
+UUID, the inode number and the generation) are stamped on every extent block the writer
+creates and verified on read: a mismatch returns `*ChecksumError` with `Kind` `"extent
+block"` ([ext4#46](https://github.com/go-filesystems/ext4/issues/46)). An image written
+by an earlier version on a `metadata_csum` filesystem, whose extent blocks are unstamped,
+is refused: read it with `Options.IgnoreChecksums` and rewrite the affected files.
 
 ## Untrusted input {#untrusted-input}
 
