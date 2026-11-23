@@ -37,6 +37,18 @@ Implements [`filesystem.Filesystem`]({{< relref "../interface.md" >}}). No cgo, 
 - Some cross-check tests require `mke2fs`
 - Not every kernel ioctl / obscure feature is implemented
 
+## Checksums {#checksums}
+
+Since v0.6.0, with `metadata_csum` set, the superblock, group descriptors, inodes,
+inode and block bitmaps and directory block tails are verified on read and on every
+read-modify-write, as the
+[kernel ext4 documentation](https://docs.kernel.org/filesystems/ext4/checksums.html)
+specifies (crc32c seeded with the filesystem UUID, the inode number and the inode
+generation). A mismatch returns `*ChecksumError` (`errors.As`), so a write can no
+longer re-seal tampered metadata. `Options.IgnoreChecksums` is the forensic opt-out,
+off by default. Extent-tree block checksums are not enforced yet
+([ext4#46](https://github.com/go-filesystems/ext4/issues/46)).
+
 ## Untrusted input {#untrusted-input}
 
 Every allocation and walk sized from a value on the image is checked against

@@ -40,6 +40,16 @@ Implements [`filesystem.Filesystem`]({{< relref "../interface.md" >}}). No cgo, 
 - Writing to a FileVault volume (it opens read-only); per-file-key
   (hardware) encryption
 
+## Checksums {#checksums}
+
+Since v0.7.0 the Fletcher-64 `o_cksum` of every object is verified on read, as the
+[Apple File System Reference](https://developer.apple.com/support/downloads/Apple-File-System-Reference.pdf)
+specifies. A mismatch returns `*ChecksumError` (`errors.As`, or `errors.Is(err,
+ErrChecksum)`). When the container superblock fails its checksum, the reader falls
+back to the newest valid older checkpoint in the checkpoint descriptor area. A write
+can no longer re-seal tampered objects. `Options.IgnoreChecksums` (`OpenWithOptions`,
+`OpenContainerOptions`) is the forensic opt-out, off by default.
+
 ## Untrusted input {#untrusted-input}
 
 Every size in an image is a claim, bounded before it is made: file reads by the
