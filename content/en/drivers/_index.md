@@ -47,7 +47,10 @@ go-filesystems/nfs bounds the whole-file fallback at 64 MiB (`NFS3ERR_IO` above)
 
 [`oci`](https://github.com/go-filesystems/oci) bounds every input-driven
 allocation before it happens (`DefaultLimits()`: manifests 16 MiB, 16 GiB for a
-whole image); an excess returns an error wrapping `safeio.ErrTooLarge`.
+whole image); an excess returns an error wrapping `safeio.ErrTooLarge`. Since
+v0.5.0 those byte caps bound the temporary disk, not RAM: file bodies, layer
+blobs and archive members above 4 MiB (or past 256 MiB in total, `Limits.MaxMemory`)
+are spooled to a mode-0600 temporary file (`Limits.SpoolDir`), released by `Close`.
 
 Also in the org: [`detect`](https://github.com/go-filesystems/detect), a
 `blkid`-style type prober and driver-opener registry that dispatches to the

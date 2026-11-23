@@ -39,7 +39,10 @@ Implements [`filesystem.Filesystem`]({{< relref "../interface.md" >}}). No cgo, 
 Every input-driven allocation is bounded before it is made: `block_size` is at
 most 1 MiB, a directory at most 4 Mi entries, and `ReadFile` refuses more than
 `DefaultMaxReadFile` (1 GiB) with `ErrTooLarge`; `ReadFileLimit(path, max)`
-picks another ceiling, and `OpenFile` + `ReadAt` stream any size.
+picks another ceiling, and `OpenFile` + `ReadAt` stream any size. Since v0.9.3 the total number of symlinks
+followed in one path lookup is bounded by `go-volumes/safeio` (40, then
+`safeio.ErrSymlinkLoop`), so a link whose target names two more links cannot cost
+2^40 lookups.
 
 ## Parallel reads {#parallel-reads}
 

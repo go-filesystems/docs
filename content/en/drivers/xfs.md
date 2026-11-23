@@ -34,7 +34,10 @@ Implements [`filesystem.Filesystem`]({{< relref "../interface.md" >}}). No cgo, 
 Every allocation and walk sized from a value on the image is checked against
 what the image can hold before it happens. `ReadFile` and remote symlinks are
 capped at `DefaultMaxReadSize` (1 GiB, changed with `SetMaxReadSize`) and refused
-with `ErrTooLarge`; bmbt extent records that overlap are refused.
+with `ErrTooLarge`; bmbt extent records that overlap are refused. Since v0.5.1
+the symlinks followed in one path lookup are bounded in total, and `DeleteDir`
+refuses a directory cycle, both through the `go-volumes/safeio` guard (a loop ends
+with `safeio.ErrSymlinkLoop` after 40 links, a cycle with `safeio.ErrCycle`).
 
 ## Install {#install}
 
