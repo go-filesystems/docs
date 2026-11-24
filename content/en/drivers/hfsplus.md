@@ -49,8 +49,9 @@ over whatever was written around it, so:
   journal that fails the checks below falls back silently to direct writes,
   exactly as in v0.17.0, and `(*Volume).JournalWritesReason()` says why. It
   returns `nil` when journal writes are on, `ErrReadOnly` or `ErrClosed`, and
-  otherwise an error wrapping `ErrJournalWritesUnavailable`. `DurabilityLazy`
-  and `Batch` still write in place, after the journal is emptied. From v0.15.0
+  otherwise an error wrapping `ErrJournalWritesUnavailable`. In v0.18.0
+  `DurabilityLazy` and `Batch` wrote in place, after the journal was emptied;
+  since v0.19.0 they are a group commit (below). From v0.15.0
   to v0.17.0 this was an opt-in, **`(*Volume).EnableJournalWrites()`**, which
   remains and does nothing when journal writes are already on.
   A commit costs 2 barriers for a session's first commit and 1 after that,
@@ -114,6 +115,12 @@ over whatever was written around it, so:
   The crash oracle replays about 28,000 crash images of these paths (wrap,
   journal full, full across the wrap, bypass right after emptying, `Close`).
   After an injected write or barrier failure, nothing more reaches the device.
+
+  **Since v0.19.0, `DurabilityLazy` and `Batch` are an in-memory group commit**
+  on a journaled volume written through its journal. A Lazy commit writes
+  nothing and pays 0 barriers; see [Durability levels](#durability).
+  **Fixed in v0.19.0:** a span sort that wrapped on 32-bit for volumes over
+  2 GiB (present in earlier releases). A linux-386 CI lane now covers it.
 
   **Security, v0.15.1:** upgrade from v0.15.0 if you use `EnableJournalWrites`
   ([go-filesystems/hfsplus#56](https://github.com/go-filesystems/hfsplus/issues/56)).
@@ -243,6 +250,21 @@ that, with or without data. `Sync` costs 0 or 1, and the volume is never
 marked dirty. A commit that cannot be journaled takes the direct
 `DurabilityStrict` path at both levels (3 barriers).
 
+Since v0.19.0, on the same volumes `DurabilityLazy` and `Batch` are an
+in-memory group commit: a Lazy commit writes nothing and pays 0 barriers. These
+write the group as one journal transaction:
+
+- `Sync` and `Close`;
+- a switch away from `DurabilityLazy`;
+- the group's size bound, min(1 MiB, journal/8), 30 runs and 4096 freed spans;
+- `Bytes()` on an in-memory volume.
+
+A `Batch` whose mutations fit one group is atomic after a crash, file data
+included. A larger `Batch` is a sequence of groups made of whole mutations, so
+a crash leaves a prefix of them. A single mutation too large for an empty group
+is not atomic, as on `DurabilityStrict`. Volumes without journal writes behave
+as in v0.18.0.
+
 On a volume that is not journaled, or whose journal fails the checks, the
 counts per commit are:
 
@@ -299,7 +321,9 @@ The v0.18.0 default has not been timed yet: the machine was too loaded
   marked dirty.
 - **`DurabilityLazy`** is data-writeback: nothing orders file data before its
   metadata, so after a crash a file may hold stale bytes of a deleted one, and
-  the mutations since the last `Sync` are lost. **Do not use it where different
+  the mutations since the last `Sync` are lost. (On a journaled volume written
+  through its journal, v0.19.0 makes a flushed group one transaction, but the
+  mutations since the last flush are still lost.) **Do not use it where different
   users share a volume**, or for a volume other clients mount at the same time.
 - `SetDurability` and `Batch` must not run concurrently with a mutator, `Sync` or
   `Close`. Leaving a level that holds the volume dirty settles it first.
