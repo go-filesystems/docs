@@ -193,12 +193,31 @@ over whatever was written around it, so:
   refused when `jhdr_size` is 0, the journal size is outside [256 KiB, 1 GiB],
   or start or end is 0, beyond the journal size, beyond 1 GiB, or not a
   multiple of 512. Two bounds guards protect our reader: `jhdr_size` at least
-  the 44-byte header and at most the journal size. Three older checks stay
-  stricter than Apple's: the magic (we accept only `JNLx`, Apple also accepts
-  `JHDR`, which we refuse), the endian field, and the journal size recorded in
-  the journal header against the Journal Info Block's. They can turn a journal macOS opens into
-  `ErrJournaled`
-  ([go-filesystems/hfsplus#48](https://github.com/go-filesystems/hfsplus/issues/48)).
+  the 44-byte header and at most the journal size.
+
+  **Since v0.20.0 the header acceptance follows Apple's `journal_open`
+  ([go-filesystems/hfsplus#48](https://github.com/go-filesystems/hfsplus/issues/48)).**
+  This is a MINOR change, because it moves which volumes open writable:
+  - the old magic `JHDR` is accepted, in native (little-endian) byte order; a
+    byte-swapped `JHDR` is refused. The writer rewrites `JHDR` as `JNLx`;
+  - the endian field is ignored;
+  - the check of the journal header's size against the Journal Info Block's is
+    replaced by a bound: the journal must lie inside the volume;
+  - the Journal Info Block's size must be 256 KiB to 1 GiB and a multiple of
+    512;
+  - a journal whose ring overlaps the volume header or the Journal Info Block
+    is refused for writing (`ErrJournaled` at a writable open); a read-only
+    `Open` is unaffected.
+
+  Volumes refused before can now open writable, and the newly invalid ones fail
+  with `ErrJournaled` at writable opens. This reader keeps its `JNLx` checksum
+  check, which is stricter than Apple's.
+
+  Also in v0.20.0: file data that a revoke forces into the journal is staged
+  within a bound of its own. Past it, the driver empties the journal early and
+  writes the staged data in place. No public API changes.
+  [Security] The journal-header fuzz oracle follows the new rules, and the
+  nightly fuzz run now turns red on a crash.
 - Read-only `Open` reads a journaled volume whatever its journal holds. By
   default it reads the blocks in place, which can be stale for metadata still in
   the journal. A caller that gets `ErrJournaled` can fall back to it.
