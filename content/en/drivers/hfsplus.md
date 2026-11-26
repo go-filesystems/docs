@@ -330,6 +330,26 @@ The v0.18.0 default has not been timed yet: the machine was too loaded
 (1-minute load 56 to 81). Its barrier counts are the same as the
 `EnableJournalWrites` row above.
 
+Re-measured at v0.19.0 (2026-11-24, clean checkout of the tag, 1-minute load
+6.73 at the start, same test, 30 interleaved rounds, medians of rounds 2-30),
+create + 1 byte + fsync:
+
+| Driver | Time | Barriers |
+|---|--:|--:|
+| macOS, HFS+ | 5.25 ms | (kernel) |
+| macOS, Journaled HFS+ | 8.73 ms | (kernel) |
+| `DurabilityStrict` (default), Journaled HFS+ image | **4.27 ms** | 1 |
+| `EnableJournalWrites`, Journaled HFS+ image | 4.38 ms | 1 |
+| `DurabilityStrict`, non-journaled image | 14.76 ms | 3 |
+| `DurabilityMounted`, non-journaled image | 8.71 ms | 2 |
+
+The default path reproduces the journal-writes row: on a journaled volume
+`DurabilityStrict` is now 2.0x faster than macOS's own driver on the same kind
+of volume, and faster than macOS on plain HFS+. mkdir and Chtimes on the
+journaled image cost 4.26 ms and 4.38 ms (1 barrier). The first round, which
+includes the session's first commit (2 barriers), is reported apart in the
+test log. One run on one machine.
+
 - **`DurabilityMounted`** behaves like a mounted HFS+ volume (Apple TN1150) and
   is data-ordered, like ext4 `data=ordered`: a commit that wrote file data puts a
   barrier between the data and the metadata that points at it. A crash between
