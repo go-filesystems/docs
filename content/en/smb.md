@@ -59,6 +59,17 @@ related-operation FileId (3.3.5.2.7.2) lives in the compound chain only. FLUSH o
 an unknown handle is `STATUS_FILE_CLOSED` instead of success. Release notes:
 [v0.17.2](https://github.com/go-filesystems/smb/releases/tag/v0.17.2).
 
+## v0.20.0: `smbc` requires encryption {#v0200}
+
+The client command `smbc` now refuses a session the server does not encrypt:
+`client.Options.AllowUnencrypted` is false by default, which sets the
+negotiator's `RequireEncryption`, and `Session.Encrypted()` reports the outcome.
+`smbc --allow-unencrypted` opts out and prints a warning. The client uses the
+fork [`go-filesystems/go-smb2`](https://github.com/go-filesystems/go-smb2) v0.1.0;
+the change is proposed upstream as
+[CloudSoda/go-smb2#80](https://github.com/CloudSoda/go-smb2/pull/80). Tested
+against Samba with encryption `required` and `desired`.
+
 ## Measured, and where {#measured}
 
 The README records the macOS kernel client (`mount_smbfs`, which settles on
